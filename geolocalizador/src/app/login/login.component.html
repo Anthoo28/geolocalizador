@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Seguridad Ciudadana</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Iconos -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+<div class="w-[1100px] h-[650px] bg-white rounded-3xl shadow-2xl overflow-hidden flex">
+
+    <!-- LADO IZQUIERDO -->
+    <div class="w-1/2 flex flex-col justify-center items-center px-16">
+
+        <!-- Logo -->
+        <div class="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center mb-6">
+            <i class="fa-solid fa-shield-halved text-3xl text-indigo-600"></i>
+        </div>
+
+        <h1 class="text-2xl font-bold text-center text-gray-800">
+            Sistema de Gestión de
+            <br>
+            Incidencias de Seguridad Ciudadana
+        </h1>
+
+        <p class="text-gray-500 mt-2 mb-8">
+            Cercado de Ica
+        </p>
+
+        <!-- Formulario -->
+        <form class="w-full space-y-5">
+
+            <!-- Correo -->
+            <div class="relative">
+                <span class="absolute left-4 top-3 text-gray-400">
+                    <i class="fa-regular fa-user"></i>
+                </span>
+
+                <input
+                    type="email"
+                    placeholder="Correo electrónico"
+                    class="w-full border rounded-lg py-3 pl-11 pr-4 outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <!-- Password -->
+            <div class="relative">
+                <span class="absolute left-4 top-3 text-gray-400">
+                    <i class="fa-solid fa-lock"></i>
+                </span>
+
+                <input
+                    type="password"
+                    placeholder="Contraseña"
+                    class="w-full border rounded-lg py-3 pl-11 pr-11 outline-none focus:ring-2 focus:ring-indigo-500">
+
+                <span class="absolute right-4 top-3 text-gray-400 cursor-pointer">
+                    <i class="fa-regular fa-eye"></i>
+                </span>
+            </div>
+
+            <div class="text-center">
+                <a href="#" class="text-sm text-gray-500 hover:text-indigo-600">
+                    ¿Olvidaste tu contraseña?
+                </a>
+            </div>
+
+            <button
+                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-semibold transition">
+                Iniciar sesión
+            </button>
+
+        </form>
+
+        <p class="text-xs text-gray-400 mt-12">
+            © 2026 Municipalidad de Ica
+        </p>
+
+    </div>
+
+    <!-- LADO DERECHO -->
+    <div class="w-1/2 relative bg-gradient-to-br from-sky-50 to-indigo-100">
+
+        <!-- Imagen -->
+    <img src="/ICA.png" alt="Ica" class="absolute inset-0 w-full h-full object-cover object-center select-none"
+        draggable="false">
+
+        <!-- Overlay -->
+        <div class="absolute inset-0 bg-white/30 backdrop-blur-[1px]"></div>
+
+        <!-- Marcadores -->
+
+        <div class="absolute top-20 right-28 w-16 h-16 rounded-full bg-white shadow-lg flex items-center justify-center">
+            <i class="fa-solid fa-shield text-3xl text-indigo-600"></i>
+        </div>
+
+        <div class="absolute bottom-28 left-20 w-14 h-14 rounded-full bg-white shadow-lg flex items-center justify-center">
+            <i class="fa-solid fa-location-dot text-3xl text-blue-500"></i>
+        </div>
+
+        <div class="absolute bottom-20 right-24 w-14 h-14 rounded-full bg-white shadow-lg flex items-center justify-center">
+            <i class="fa-solid fa-location-dot text-3xl text-red-500"></i>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
