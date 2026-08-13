@@ -1,0 +1,328 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<div class="flex h-screen">
+
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-gray-800 text-white flex flex-col">
+
+        <!-- Logo + título -->
+        <div class="flex items-center p-4 space-x-3">
+
+            <!-- Logo del sistema -->
+            <div class="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center">
+                <i class="fa-solid fa-shield-halved text-3xl text-indigo-600"></i>
+            </div>
+
+            <!-- Nombre del sistema -->
+            <span class="text-xl font-bold">
+                Seguridad Ica
+            </span>
+
+        </div>
+
+        <!-- Navegación -->
+        <nav class="mt-5 space-y-2">
+
+            <!-- Dashboard -->
+            <a routerLink="/dashboard" class="block px-4 py-2 hover:bg-gray-700">
+                Dashboard
+            </a>
+
+            <!-- Incidencias -->
+            <a routerLink="/usuarios" class="block px-4 py-2 hover:bg-gray-700">
+                Incidencias
+            </a>
+
+            <!-- Mapa -->
+            <a routerLink="/configuracion" class="block px-4 py-2 hover:bg-gray-700">
+                Mapa
+            </a>
+
+            <!-- Reporte -->
+            <a routerLink="/configuracion" class="block px-4 py-2 hover:bg-gray-700">
+                Reporte
+            </a>
+
+            <!-- Usuarios -->
+            <a routerLink="/configuracion" class="block px-4 py-2 hover:bg-gray-700">
+                Usuarios
+            </a>
+            <!-- Sectores -->
+            <a routerLink="/configuracion" class="block px-4 py-2 hover:bg-gray-700">
+                Sectores
+            </a>
+            <!-- Comisarías -->
+            <a routerLink="/configuracion" class="block px-4 py-2 hover:bg-gray-700">
+                Comisarías
+            </a>
+            <!-- Configuracion -->
+            <a routerLink="/configuracion" class="block px-4 py-2 hover:bg-gray-700">
+                Configuración
+            </a>
+        </nav>
+
+    </aside>
+
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-1 bg-gray-100">
+
+        <!-- Cabecera -->
+        <header class="bg-white shadow-sm px-8 py-5">
+
+            <div class="flex items-center justify-between">
+
+                <!-- Título del Dashboard -->
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">
+                        Dashboard
+                    </h1>
+
+                    <p class="mt-1 text-gray-500">
+                        Sistema de Seguridad Ciudadana
+                    </p>
+                </div>
+
+
+                <!-- Usuario -->
+                <div class="flex items-center gap-3">
+
+                    <!-- Imagen -->
+                    <img src="https://i.pravatar.cc/100?img=12" alt="Usuario"
+                        class="w-10 h-10 rounded-full object-cover">
+
+                    <!-- Nombre -->
+                    <div>
+                        <p class="text-sm font-semibold text-gray-800">
+                            Juan Pérez
+                        </p>
+
+                        <p class="text-xs text-gray-500">
+                            Administrador
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- Contenido -->
+        <section class="p-8">
+
+            <!-- Tarjetas -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                <!-- Incidencias -->
+                <div class="bg-white rounded-lg shadow p-6">
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+                            <p class="text-sm text-gray-500">
+                                Incidencias hoy
+                            </p>
+
+                            <p class="text-3xl font-bold text-gray-800 mt-2">
+                                125
+                            </p>
+                        </div>
+
+                        <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center">
+                            <i class="fa-solid fa-triangle-exclamation text-xl text-indigo-600"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Pendientes -->
+                <div class="bg-white rounded-lg shadow p-6">
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+                            <p class="text-sm text-gray-500">
+                                En atención
+                            </p>
+
+                            <p class="text-3xl font-bold text-gray-800 mt-2">
+                                18
+                            </p>
+                        </div>
+
+                        <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center">
+                            <i class="fa-solid fa-clock text-xl text-yellow-600"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Atendidas -->
+                <div class="bg-white rounded-lg shadow p-6">
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+                            <p class="text-sm text-gray-500">
+                                Incidencias atendidas
+                            </p>
+
+                            <p class="text-3xl font-bold text-gray-800 mt-2">
+                                97
+                            </p>
+                        </div>
+
+                        <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                            <i class="fa-solid fa-check text-xl text-green-600"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Zonas críticas -->
+                <div class="bg-white rounded-lg shadow p-6">
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+                            <p class="text-sm text-gray-500">
+                                Zonas críticas
+                            </p>
+
+                            <p class="text-3xl font-bold text-gray-800 mt-2">
+                                10
+                            </p>
+                        </div>
+
+                        <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                            <i class="fa-solid fa-location-dot text-xl text-red-600"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Sección inferior -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+
+                <!-- Mapa -->
+                <div class="bg-white rounded-lg shadow p-6">
+
+                    <h2 class="text-xl font-bold text-gray-800">
+                        Mapa de incidencias
+                    </h2>
+
+                    <p class="text-gray-500 mt-2">
+                        Visualización georreferenciada de las incidencias registradas.
+                    </p>
+
+                    <div class="mt-4 h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+
+                        <div class="text-center text-gray-500">
+
+                            <i class="fa-solid fa-map-location-dot text-4xl mb-3"></i>
+
+                            <p>
+                                Aquí irá el mapa
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Últimas incidencias -->
+                <div class="bg-white rounded-lg shadow p-6">
+
+                    <h2 class="text-xl font-bold text-gray-800">
+                        Últimas incidencias
+                    </h2>
+
+                    <div class="mt-4 space-y-4">
+
+                        <div class="flex items-center justify-between border-b pb-3">
+
+                            <div>
+                                <p class="font-medium text-gray-800">
+                                    Robo
+                                </p>
+
+                                <p class="text-sm text-gray-500">
+                                    Ica - 10:30 AM
+                                </p>
+                            </div>
+
+                            <span class="px-3 py-1 text-sm rounded-full bg-red-100 text-red-600">
+                                Pendiente
+                            </span>
+
+                        </div>
+
+
+                        <div class="flex items-center justify-between border-b pb-3">
+
+                            <div>
+                                <p class="font-medium text-gray-800">
+                                    Accidente de tránsito
+                                </p>
+
+                                <p class="text-sm text-gray-500">
+                                    Ica - 09:15 AM
+                                </p>
+                            </div>
+
+                            <span class="px-3 py-1 text-sm rounded-full bg-green-100 text-green-600">
+                                Atendida
+                            </span>
+
+                        </div>
+
+
+                        <div class="flex items-center justify-between">
+
+                            <div>
+                                <p class="font-medium text-gray-800">
+                                    Disturbio
+                                </p>
+
+                                <p class="text-sm text-gray-500">
+                                    Ica - 08:40 AM
+                                </p>
+                            </div>
+
+                            <span class="px-3 py-1 text-sm rounded-full bg-yellow-100 text-yellow-600">
+                                En proceso
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
