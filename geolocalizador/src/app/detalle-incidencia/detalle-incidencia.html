@@ -1,0 +1,131 @@
+<div class="min-h-screen bg-gray-50 flex flex-col p-6 lg:p-10 font-sans">
+
+  <!-- CABECERA SUPERIOR: 6. DETALLE DE INCIDENCIA -->
+  <div class="mb-6">
+    <span class="text-xs font-bold text-indigo-700 tracking-wider uppercase mb-1 block">6. DETALLE DE INCIDENCIA</span>
+    
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-200">
+      <div class="flex items-center gap-4">
+        <button routerLink="/mapa" class="text-sm font-medium text-gray-500 hover:text-gray-800 flex items-center gap-1 cursor-pointer">
+          ← Volver
+        </button>
+        <h1 class="text-lg font-bold text-gray-900">{{ incidencia.codigo }}</h1>
+        <span class="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-semibold rounded-full">
+          {{ incidencia.estado }}
+        </span>
+      </div>
+      
+      <button (click)="editarIncidencia()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-xl flex items-center gap-2 cursor-pointer shadow-sm">
+        <i class="fa-solid fa-pen-to-square"></i> Editar
+      </button>
+    </div>
+  </div>
+
+  <!-- GRID PRINCIPAL DE 2 COLUMNAS -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+    <!-- ================= COLUMNA IZQUIERDA: INFORMACIÓN GENERAL ================= -->
+    <div class="lg:col-span-6 bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-4">
+      <h2 class="text-sm font-bold text-gray-800 mb-2">Información general</h2>
+
+      <div class="grid grid-cols-3 gap-2 text-xs">
+        <span class="text-gray-500 font-medium">Tipo:</span>
+        <span class="col-span-2 text-gray-800 font-semibold">{{ incidencia.tipo }}</span>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 text-xs">
+        <span class="text-gray-500 font-medium">Título:</span>
+        <span class="col-span-2 text-gray-800 font-semibold">{{ incidencia.titulo }}</span>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 text-xs">
+        <span class="text-gray-500 font-medium">Descripción:</span>
+        <span class="col-span-2 text-gray-700 leading-relaxed">{{ incidencia.descripcion }}</span>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 text-xs">
+        <span class="text-gray-500 font-medium">Fecha y hora:</span>
+        <span class="col-span-2 text-gray-800">{{ incidencia.fechaHora }}</span>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 text-xs">
+        <span class="text-gray-500 font-medium">Dirección:</span>
+        <span class="col-span-2 text-gray-800">{{ incidencia.direccion }}</span>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 text-xs">
+        <span class="text-gray-500 font-medium">Referencia:</span>
+        <span class="col-span-2 text-gray-800">{{ incidencia.referencia }}</span>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 text-xs">
+        <span class="text-gray-500 font-medium">Sector:</span>
+        <span class="col-span-2 text-gray-800">{{ incidencia.sector }}</span>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 text-xs">
+        <span class="text-gray-500 font-medium">Comisaría:</span>
+        <span class="col-span-2 text-gray-800">{{ incidencia.comisaria }}</span>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 text-xs">
+        <span class="text-gray-500 font-medium">Registrado por:</span>
+        <span class="col-span-2 text-gray-800">{{ incidencia.registradoPor }}</span>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 text-xs">
+        <span class="text-gray-500 font-medium">Asignado a:</span>
+        <span class="col-span-2 text-gray-800">{{ incidencia.asignadoA }}</span>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 text-xs">
+        <span class="text-gray-500 font-medium">Prioridad:</span>
+        <span class="col-span-2 text-red-600 font-bold">{{ incidencia.prioridad }}</span>
+      </div>
+    </div>
+
+    <!-- ================= COLUMNA DERECHA: UBICACIÓN, EVIDENCIAS E HISTORIAL ================= -->
+    <div class="lg:col-span-6 space-y-6">
+
+      <!-- MAPA DE UBICACIÓN -->
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-3">
+        <h2 class="text-sm font-bold text-gray-800">Ubicación</h2>
+        <div id="map-detalle" class="w-full h-40 rounded-xl border border-gray-100 z-0"></div>
+      </div>
+
+      <!-- EVIDENCIAS -->
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-3">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-bold text-gray-800">Evidencias (2)</h2>
+          <button class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold cursor-pointer">Ver todas</button>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="h-28 bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
+            <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=400&q=80" alt="Evidencia 1" class="w-full h-full object-cover">
+          </div>
+          <div class="h-28 bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
+            <img src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=400&q=80" alt="Evidencia 2" class="w-full h-full object-cover">
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORIAL DE ESTADOS -->
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-4">
+        <h2 class="text-sm font-bold text-gray-800">Historial de estados</h2>
+        
+        <div class="space-y-3">
+          <div *ngFor="let h of incidencia.historial" class="flex items-center justify-between text-xs border-b border-gray-100 pb-2.5">
+            <div class="flex items-center gap-2.5">
+              <span [class]="h.estado === 'Registrada' ? 'w-2.5 h-2.5 rounded-full bg-purple-600' : 'w-2.5 h-2.5 rounded-full bg-amber-500'"></span>
+              <span class="font-semibold text-gray-800">{{ h.estado }}</span>
+            </div>
+            <span class="text-gray-500">{{ h.fecha }}</span>
+            <span class="text-gray-700 font-medium">{{ h.autor }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>

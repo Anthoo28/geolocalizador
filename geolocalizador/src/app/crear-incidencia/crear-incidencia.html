@@ -1,0 +1,145 @@
+<div class="min-h-screen bg-gray-50 flex flex-col p-6 lg:p-10 font-sans">
+
+  <!-- CABECERA SUPERIOR -->
+  <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center gap-4">
+      <button routerLink="/incidencia" class="text-sm font-medium text-gray-500 hover:text-gray-800 flex items-center gap-1 cursor-pointer">
+        ← Volver
+      </button>
+      <h1 class="text-xl font-bold text-gray-900">Nueva incidencia</h1>
+    </div>
+  </div>
+
+  <!-- PESTAÑAS DE NAVEGACIÓN -->
+  <div class="flex border-b border-gray-200 mb-6 gap-8">
+    <button 
+      (click)="tabActiva = 'general'"
+      [class]="tabActiva === 'general' ? 'border-indigo-600 text-indigo-600 font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700'"
+      class="pb-3 border-b-2 text-sm transition cursor-pointer">
+      Información general
+    </button>
+    <button 
+      (click)="tabActiva = 'evidencias'"
+      [class]="tabActiva === 'evidencias' ? 'border-indigo-600 text-indigo-600 font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700'"
+      class="pb-3 border-b-2 text-sm transition cursor-pointer">
+      Evidencias y observaciones
+    </button>
+  </div>
+
+  <!-- CONTENIDO PRINCIPAL (GRID DE 2 COLUMNAS) -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 bg-white p-6 lg:p-8 rounded-2xl shadow-sm border border-gray-200">
+
+    <!-- ================= COLUMNA IZQUIERDA: FORMULARIO GENERAL ================= -->
+    <div class="lg:col-span-6 space-y-5" *ngIf="tabActiva === 'general'">
+      
+      <!-- Tipo de incidencia -->
+      <div class="space-y-1.5">
+        <label class="block text-xs font-semibold text-gray-700">Tipo de incidencia *</label>
+        <select [(ngModel)]="incidencia.tipo" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <option>Robo</option>
+          <option>Asalto</option>
+          <option>Emergencia médica</option>
+          <option>Disturbio</option>
+        </select>
+      </div>
+
+      <!-- Título -->
+      <div class="space-y-1.5">
+        <label class="block text-xs font-semibold text-gray-700">Título *</label>
+        <input type="text" [(ngModel)]="incidencia.titulo" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      </div>
+
+      <!-- Descripción -->
+      <div class="space-y-1.5">
+        <label class="block text-xs font-semibold text-gray-700">Descripción *</label>
+        <textarea rows="3" [(ngModel)]="incidencia.descripcion" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+      </div>
+
+      <!-- Fecha y hora -->
+      <div class="space-y-1.5">
+        <label class="block text-xs font-semibold text-gray-700">Fecha y hora del incidente *</label>
+        <input type="datetime-local" [(ngModel)]="incidencia.fechaHora" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      </div>
+
+      <!-- Prioridad -->
+  <!-- Prioridad -->
+      <div class="space-y-1.5">
+        <label class="block text-xs font-semibold text-gray-700">Prioridad</label>
+        <select [(ngModel)]="incidencia.prioridad" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <option value="BAJA">Baja</option>
+          <option value="MEDIA">Media</option>
+          <option value="ALTA">Alta</option>
+        </select>
+      </div>
+
+    </div>
+
+    <!-- Pestaña de Evidencias (Alternativa) -->
+    <div class="lg:col-span-6 space-y-4" *ngIf="tabActiva === 'evidencias'">
+      <div class="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center bg-gray-50">
+        <p class="text-xs text-gray-500 mb-2">Arrastra archivos o haz clic para subir evidencias fotográficas</p>
+        <input type="file" class="text-xs text-gray-500">
+      </div>
+    </div>
+
+    <!-- ================= COLUMNA DERECHA: UBICACIÓN Y MAPA ================= -->
+    <div class="lg:col-span-6 space-y-4 border-t lg:border-t-0 lg:border-l lg:pl-8 border-gray-200">
+      
+      <h2 class="text-xs font-bold text-gray-800">Ubicación *</h2>
+
+      <!-- Buscador de dirección actualizado -->
+      <input #inputBuscador type="text" (keydown.enter)="$event.preventDefault(); buscarDireccion(inputBuscador.value)" placeholder="Buscar dirección (Presiona Enter)" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+
+      <!-- CONTENEDOR DEL MINI MAPA LEAFLET -->
+      <div id="mini-map" class="w-full h-48 rounded-2xl border border-gray-200 z-0"></div>
+
+      <!-- Latitud y Longitud -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-1">
+          <label class="block text-[11px] font-medium text-gray-500">Latitud</label>
+          <input type="number" [(ngModel)]="incidencia.latitud" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-xs text-gray-700">
+        </div>
+        <div class="space-y-1">
+          <label class="block text-[11px] font-medium text-gray-500">Longitud</label>
+          <input type="number" [(ngModel)]="incidencia.longitud" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-xs text-gray-700">
+        </div>
+      </div>
+
+      <!-- Referencia -->
+      <div class="space-y-1">
+        <label class="block text-[11px] font-medium text-gray-500">Referencia</label>
+        <input type="text" [(ngModel)]="incidencia.referencia" placeholder="Ej. Frente a la plaza de armas" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-xs text-gray-700">
+      </div>
+
+      <!-- Sector y Comisaría (Dinámicos) -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-1">
+          <label class="block text-[11px] font-medium text-gray-500">Sector *</label>
+          <select [(ngModel)]="incidencia.sector" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-xs text-gray-700">
+            <option value="" disabled>Seleccione un sector</option>
+            <option *ngFor="let s of sectores" [value]="s._id">{{ s.nombre }}</option>
+          </select>
+        </div>
+        <div class="space-y-1">
+          <label class="block text-[11px] font-medium text-gray-500">Comisaría *</label>
+          <select [(ngModel)]="incidencia.comisaria" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-xs text-gray-700">
+            <option value="" disabled>Seleccione una comisaría</option>
+            <option *ngFor="let c of comisarias" [value]="c._id">{{ c.nombre }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- BOTONES DE ACCIÓN -->
+      <div class="flex items-center justify-end gap-3 pt-4">
+        <button routerLink="/incidencia" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-xl cursor-pointer">
+          Cancelar
+        </button>
+        <button (click)="guardarIncidencia()" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-xl shadow-sm cursor-pointer">
+          Guardar incidencia
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+</div>

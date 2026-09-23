@@ -1,0 +1,118 @@
+<!-- CONTENEDOR PRINCIPAL -->
+<div class="flex h-screen bg-slate-50 font-sans overflow-hidden">
+
+  <!-- COMPONENTE SIDEBAR -->
+  <app-sidebar></app-sidebar>
+
+  <!-- ÁREA DE CONTENIDO PRINCIPAL -->
+  <main class="flex-1 overflow-y-auto relative flex flex-col">
+    
+    <!-- ENCABEZADO SUPERIOR FLOTANTE -->
+    <header class="absolute top-4 right-6 left-6 z-[1000] flex items-center justify-between pointer-events-none">
+      <h1 class="text-sm font-bold text-slate-800 bg-white/95 backdrop-blur-md px-4 py-2 rounded-xl shadow-sm border border-slate-200/80 pointer-events-auto">
+        3. MAPA INTERACTIVO - ICA, PERÚ
+      </h1>
+      <h1 class="text-sm font-bold text-slate-800 bg-white/95 backdrop-blur-md px-4 py-2 rounded-xl shadow-sm border border-slate-200/80 pointer-events-auto">
+  {{ totalIncidencias }} INCIDENCIAS - MAPA INTERACTIVO - ICA, PERÚ
+</h1>
+
+      <div class="flex items-center gap-4 pointer-events-auto">
+        <div class="relative hidden md:block w-72">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </span>
+          <input type="text" placeholder="Buscar dirección en Ica" class="w-full bg-white/95 backdrop-blur-md border border-slate-200/85 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+        </div>
+
+        <button class="p-2 bg-white/95 backdrop-blur-md border border-slate-200/85 rounded-xl text-slate-400 hover:text-slate-600 shadow-sm cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+        </button>
+
+        <div class="flex items-center gap-3 bg-white/95 backdrop-blur-md border border-slate-200/85 px-3 py-1.5 rounded-xl shadow-sm">
+          <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs">
+            <img src="https://ui-avatars.com/api/?name=Juan+Perez&background=e0e7ff&color=4338ca" alt="Usuario">
+          </div>
+          <div class="flex flex-col">
+            <span class="text-xs font-semibold text-slate-800 leading-none">{{ usuario?.nombre }}</span>
+            <span class="text-[10px] text-slate-500 mt-0.5">{{ usuario?.rol }}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENEDOR DEL MAPA REAL INTERACTIVO -->
+    <div id="map" class="absolute inset-0 w-full h-full z-0"></div>
+
+    <!-- ================= VENTANA FLOTANTE DE DETALLE DINÁMICA ================= -->
+    <div *ngIf="incidenciaSeleccionada" class="absolute top-[34%] left-[48%] bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200/80 p-4 w-72 z-[1000]">
+      <div class="flex items-start justify-between mb-2">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 bg-red-500 rounded-full inline-block"></span>
+          <h3 class="text-xs font-bold text-slate-800">{{ incidenciaSeleccionada.titulo }}</h3>
+        </div>
+        <button (click)="cerrarDetalle()" class="text-slate-400 hover:text-slate-600 text-xs font-bold cursor-pointer">✕</button>
+      </div>
+      <div class="space-y-1 text-[11px] text-slate-500 mb-3">
+        <p class="flex items-center gap-1.5">📍 {{ incidenciaSeleccionada.direccion }}</p>
+        <p class="flex items-center gap-1.5">🕒 {{ incidenciaSeleccionada.fechaHora | date:'dd/MM/yyyy - HH:mm' }}</p>
+      </div>
+      <button (click)="verDetalles(incidenciaSeleccionada._id)" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium text-xs py-2 rounded-xl transition-colors cursor-pointer">
+        Ver detalles
+      </button>
+    </div>
+
+    <!-- ================= CONTROLES DE ZOOM LATERAL DERECHO ================= -->
+    <div class="absolute right-6 top-24 flex flex-col bg-white/95 backdrop-blur-md rounded-xl shadow-md border border-slate-200/80 overflow-hidden z-[1000]">
+      <button (click)="acercarZoom()" class="p-2.5 hover:bg-slate-50 text-slate-700 border-b border-slate-100 cursor-pointer" title="Acercar">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+      </button>
+      <button (click)="alejarZoom()" class="p-2.5 hover:bg-slate-50 text-slate-700 border-b border-slate-100 cursor-pointer" title="Alejar">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+      </button>
+      <button (click)="restablecerVista()" class="p-2.5 hover:bg-slate-50 text-slate-700 cursor-pointer" title="Restablecer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+      </button>
+    </div>
+
+    <!-- ================= PANEL DE FILTROS LATERAL IZQUIERDO ================= -->
+    <div class="absolute left-6 top-24 w-72 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200/80 p-4 z-[1000] space-y-3">
+      <h2 class="text-xs font-bold text-slate-800">Filtros</h2>
+      
+      <div class="space-y-1">
+        <label class="text-[11px] font-medium text-slate-500">Desde / Hasta</label>
+        <div class="flex items-center gap-1">
+          <input type="date" [(ngModel)]="filtroFechaInicio" class="w-1/2 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-[10px] text-slate-700">
+          <input type="date" [(ngModel)]="filtroFechaFin" class="w-1/2 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-[10px] text-slate-700">
+        </div>
+      </div>
+
+      <div class="space-y-1">
+        <label class="text-[11px] font-medium text-slate-500">Tipo de incidencia</label>
+        <select [(ngModel)]="filtroTipo" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-[11px] text-slate-700">
+          <option value="Todos">Todos</option>
+          <option *ngFor="let tipo of tiposDelitoDisponibles" [value]="tipo">{{ tipo }}</option>
+        </select>
+      </div>
+
+      <div class="flex items-center gap-2 pt-1">
+        <button (click)="aplicarFiltros()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs py-2 rounded-xl cursor-pointer">Aplicar</button>
+        <button (click)="limpiarFiltros()" class="px-4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium text-xs py-2 rounded-xl cursor-pointer">Limpiar</button>
+      </div>
+    </div>
+
+    <!-- ================= LEYENDA FLOTANTE INFERIOR IZQUIERDA ================= -->
+    <div class="absolute left-6 bottom-6 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200/80 p-3.5 w-40 z-[1000] space-y-2">
+      <h3 class="text-[11px] font-bold text-slate-800">Leyenda</h3>
+      <div class="space-y-1.5 text-[11px] text-slate-600">
+        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span><span>Registrado</span></div>
+        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span><span>En atención</span></div>
+        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span><span>Atendida</span></div>
+      </div>
+    </div>
+
+  </main>
+</div>

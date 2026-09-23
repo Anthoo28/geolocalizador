@@ -1,325 +1,152 @@
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Incidencia</title>
+<div class="flex h-screen bg-gray-100 overflow-hidden">
 
-    <!-- Iconos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-</head>
-<div class="flex h-screen">
+  <!-- COMPONENTE SIDEBAR REUTILIZABLE -->
+  <app-sidebar></app-sidebar>
 
-<!-- SIDEBAR -->
-    <aside class="w-64 bg-gray-800 text-white flex flex-col flex-shrink-0">
-
-    <!-- Logo + título -->
-    <div class="flex items-center p-4 space-x-3">
-
-        <!-- Logo del sistema -->
-        <div class="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center">
-            <i class="fa-solid fa-shield-halved text-3xl text-indigo-600"></i>
-        </div>
-
-        <!-- Nombre del sistema -->
-        <span class="text-xl font-bold">
-            Seguridad Ica
-        </span>
-
-    </div>
-
-    <!-- Navegación -->
-    <nav class="mt-5 space-y-2">
-
-        <a routerLink="/dashboard"
-           class="block px-4 py-2 hover:bg-gray-700">
-            Dashboard
-        </a>
-
-        <!-- Incidencias activa -->
-        <a routerLink="/incidencia"
-           class="block px-4 py-2 bg-gray-700">
-            Incidencias
-        </a>
-
-        <a routerLink="/configuracion"
-           class="block px-4 py-2 hover:bg-gray-700">
-            Mapa
-        </a>
-
-        <a routerLink="/configuracion"
-           class="block px-4 py-2 hover:bg-gray-700">
-            Reporte
-        </a>
-
-        <a routerLink="/configuracion"
-           class="block px-4 py-2 hover:bg-gray-700">
-            Usuarios
-        </a>
-
-        <a routerLink="/configuracion"
-           class="block px-4 py-2 hover:bg-gray-700">
-            Sectores
-        </a>
-
-        <a routerLink="/configuracion"
-           class="block px-4 py-2 hover:bg-gray-700">
-            Comisarías
-        </a>
-
-        <a routerLink="/configuracion"
-           class="block px-4 py-2 hover:bg-gray-700">
-            Configuración
-        </a>
-
-    </nav>
-
-</aside>
-
-
-<!-- CONTENIDO PRINCIPAL -->
-<main class="flex-1 bg-gray-100 overflow-auto">
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="flex-1 bg-gray-100 overflow-y-auto flex flex-col">
 
     <!-- CABECERA -->
     <header class="bg-white shadow-sm px-8 py-5">
-
-        <div class="flex items-center justify-between">
-
-            <!-- Título -->
-            <div>
-                <h1 class="text-3xl font-bold text-gray-800">
-                    Incidencia
-                </h1>
-
-                <p class="mt-1 text-gray-500">
-                    Sistema de Seguridad Ciudadana
-                </p>
-            </div>
-            <button
-                class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-3 rounded-lg shadow-sm transition flex items-center gap-2">
-
-                <i class="fa-solid fa-plus"></i>
-
-                Nueva incidencia
-
-            </button>
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800">Incidencia</h1>
+          <p class="mt-1 text-gray-500">Sistema de Seguridad Ciudadana</p>
         </div>
-
+        <button 
+          routerLink="/nueva-incidencia"
+          class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-3 rounded-lg shadow-sm transition flex items-center gap-2 cursor-pointer">
+          <i class="fa-solid fa-plus"></i>
+          Nueva incidencia
+        </button>
+      </div>
     </header>
-
 
     <!-- CONTENIDO DE INCIDENCIAS -->
     <section class="p-8">
-        <!-- BUSCADOR + FILTRO -->
-        <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
 
-            <div class="flex items-center gap-3">
+      <!-- BUSCADOR + FILTRO -->
+      <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+        <div class="flex items-center gap-3">
 
-                <!-- Buscador -->
-                <div class="relative flex-1">
-
-                    <!-- Icono lupa -->
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-
-                        <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
-
-                    </div>
-
-                    <input
-                        type="text"
-                        placeholder="Buscar por código, título o dirección"
-                        class="w-full border border-gray-300 rounded-lg py-3 pl-11 pr-4 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-
-                </div>
-
-
-                <!-- Botón filtro -->
-                <button
-                    class="px-5 py-3 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 flex items-center gap-2">
-
-                    <i class="fa-solid fa-filter"></i>
-
-                    Filtro
-
-                </button>
-
+          <!-- Buscador vinculado con ngModel -->
+          <div class="relative flex-1">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+              <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
             </div>
+            <input
+              type="text"
+              [(ngModel)]="searchTerm"
+              (input)="filtrar()"
+              placeholder="Buscar por código, título o dirección"
+              class="w-full border border-gray-300 rounded-lg py-3 pl-11 pr-4 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+
+          <!-- Botón de Filtro con Menú Desplegable -->
+          <div class="relative">
+            <button 
+              type="button"
+              (click)="toggleFiltrosMenu($event)"
+              class="px-5 py-3 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 flex items-center gap-2 font-medium cursor-pointer">
+              <i class="fa-solid fa-filter"></i>
+              Filtro
+              <!-- Indicador visual si hay un filtro activo -->
+              <span *ngIf="filtroEstadoSeleccionado" class="w-2 h-2 rounded-full bg-indigo-600"></span>
+            </button>
+
+            <!-- MENÚ DESPLEGABLE -->
+            <div *ngIf="mostrarFiltrosMenu" class="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-xl z-50 py-2">
+              <div class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Filtrar por Estado</div>
+              <button type="button" (click)="seleccionarFiltroEstado('')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 cursor-pointer">Todos</button>
+              <button type="button" (click)="seleccionarFiltroEstado('REGISTRADA')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 cursor-pointer">Registrada</button>
+              <button type="button" (click)="seleccionarFiltroEstado('EN_ATENCION')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 cursor-pointer">En atención</button>
+              <button type="button" (click)="seleccionarFiltroEstado('ATENDIDA')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 cursor-pointer">Atendida</button>
+              <button type="button" (click)="seleccionarFiltroEstado('CANCELADA')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 cursor-pointer">Cancelada</button>
+              
+              <div class="border-t border-gray-100 my-1"></div>
+              <button type="button" (click)="limpiarFiltros()" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer">Limpiar filtros</button>
+            </div>
+          </div>
 
         </div>
+      </div>
 
+      <!-- TABLA -->
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <table class="w-full text-sm text-left">
 
-        <!-- TABLA -->
-        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+          <!-- CABECERA DE TABLA -->
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th class="px-6 py-4 font-semibold text-gray-600">Código</th>
+              <th class="px-6 py-4 font-semibold text-gray-600">Título</th>
+              <th class="px-6 py-4 font-semibold text-gray-600">Tipo</th>
+              <th class="px-6 py-4 font-semibold text-gray-600">Estado</th>
+              <th class="px-6 py-4 font-semibold text-gray-600">Fecha</th>
+              <th class="px-6 py-4 font-semibold text-gray-600 text-center">Acciones</th>
+            </tr>
+          </thead>
 
-            <table class="w-full text-sm text-left">
+          <!-- CUERPO DINÁMICO -->
+          <tbody class="divide-y divide-gray-200">
 
-                <!-- CABECERA -->
-                <thead class="bg-gray-50 border-b border-gray-200">
+            <!-- Estado: Cargando -->
+            <tr *ngIf="isLoading">
+              <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                <i class="fa-solid fa-circle-notch fa-spin text-2xl text-indigo-600 mb-2"></i>
+                <p>Cargando incidencias reales...</p>
+              </td>
+            </tr>
 
-                    <tr>
+            <!-- Estado: Sin registros -->
+            <tr *ngIf="!isLoading && incidenciasFiltradas.length === 0">
+              <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                No se encontraron incidencias registradas.
+              </td>
+            </tr>
 
-                        <th class="px-6 py-4 font-semibold text-gray-600">
-                            Código
-                        </th>
+            <!-- Filas con datos reales -->
+            <tr *ngFor="let inc of incidenciasFiltradas" class="hover:bg-gray-50 transition">
 
-                        <th class="px-6 py-4 font-semibold text-gray-600">
-                            Título
-                        </th>
+              <td class="px-6 py-4 text-gray-700 font-medium">
+                {{ inc.codigo }}
+              </td>
 
-                        <th class="px-6 py-4 font-semibold text-gray-600">
-                            Tipo
-                        </th>
+              <td class="px-6 py-4 font-semibold text-gray-800">
+                {{ inc.titulo }}
+              </td>
 
-                        <th class="px-6 py-4 font-semibold text-gray-600">
-                            Estado
-                        </th>
+              <td class="px-6 py-4 text-gray-600 capitalize">
+                {{ inc.tipoDelito | lowercase }}
+              </td>
 
-                        <th class="px-6 py-4 font-semibold text-gray-600">
-                            Fecha
-                        </th>
+              <td class="px-6 py-4">
+                <span [class]="'px-3 py-1 text-xs font-semibold rounded-full inline-block ' + obtenerClaseEstado(inc.estado)">
+                  {{ formatearEstado(inc.estado) }}
+                </span>
+              </td>
 
-                        <th class="px-6 py-4 font-semibold text-gray-600 text-center">
-                            Acción
-                        </th>
+              <td class="px-6 py-4 text-gray-600">
+                {{ inc.fechaHora | date:'dd/MM/yyyy' }}
+              </td>
 
-                    </tr>
+              <td class="px-6 py-4 text-center">
+                <button
+                  [routerLink]="['/detalle-incidencia', inc._id]"
+                  class="text-indigo-600 hover:text-indigo-800 p-1 cursor-pointer"
+                  title="Ver incidencia">
+                  <i class="fa-solid fa-eye text-base"></i>
+                </button>
+              </td>
 
-                </thead>
+            </tr>
 
+          </tbody>
 
-                <!-- CUERPO -->
-                <tbody class="divide-y divide-gray-200">
-
-                    <!-- Fila 1 -->
-                    <tr class="hover:bg-gray-50">
-
-                        <td class="px-6 py-4 text-gray-700">
-                            INC-001
-                        </td>
-
-                        <td class="px-6 py-4 font-medium text-gray-800">
-                            Robo en vía pública
-                        </td>
-
-                        <td class="px-6 py-4 text-gray-600">
-                            Robo
-                        </td>
-
-                        <td class="px-6 py-4">
-
-                            <span class="px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700">
-                                Pendiente
-                            </span>
-
-                        </td>
-
-                        <td class="px-6 py-4 text-gray-600">
-                            31/08/2026
-                        </td>
-
-                        <td class="px-6 py-4 text-center">
-
-                            <button
-                                class="text-indigo-600 hover:text-indigo-800"
-                                title="Ver incidencia">
-
-                                <i class="fa-solid fa-eye"></i>
-
-                            </button>
-
-                        </td>
-
-                    </tr>
-
-
-                    <!-- Fila 2 -->
-                    <tr class="hover:bg-gray-50">
-
-                        <td class="px-6 py-4 text-gray-700">
-                            INC-002
-                        </td>
-
-                        <td class="px-6 py-4 font-medium text-gray-800">
-                            Accidente de tránsito
-                        </td>
-
-                        <td class="px-6 py-4 text-gray-600">
-                            Accidente
-                        </td>
-
-                        <td class="px-6 py-4">
-
-                            <span class="px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700">
-                                En proceso
-                            </span>
-
-                        </td>
-
-                        <td class="px-6 py-4 text-gray-600">
-                            31/08/2026
-                        </td>
-
-                        <td class="px-6 py-4 text-center">
-
-                            <button
-                                class="text-indigo-600 hover:text-indigo-800"
-                                title="Ver incidencia">
-
-                                <i class="fa-solid fa-eye"></i>
-
-                            </button>
-
-                        </td>
-
-                    </tr>
-
-
-                    <!-- Fila 3 -->
-                    <tr class="hover:bg-gray-50">
-
-                        <td class="px-6 py-4 text-gray-700">
-                            INC-003
-                        </td>
-
-                        <td class="px-6 py-4 font-medium text-gray-800">
-                            Disturbio en vía pública
-                        </td>
-
-                        <td class="px-6 py-4 text-gray-600">
-                            Disturbio
-                        </td>
-
-                        <td class="px-6 py-4">
-
-                            <span class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">
-                                Atendida
-                            </span>
-
-                        </td>
-
-                        <td class="px-6 py-4 text-gray-600">
-                            30/08/2026
-                        </td>
-
-                        <td class="px-6 py-4 text-center">
-
-                            <button
-                                class="text-indigo-600 hover:text-indigo-800"
-                                title="Ver incidencia">
-
-                                <i class="fa-solid fa-eye"></i>
-
-                            </button>
-
-                        </td>
-
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </div>
+        </table>
+      </div>
 
     </section>
 
-</main>
+  </main>
 </div>

@@ -1,0 +1,52 @@
+/* Contenedor principal con altura explícita */
+.radar-overlay-container {
+  position: relative;
+  width: 100%;
+  height: 480px; /* Altura explícita definida */
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background-color: #0f172a;
+}
+
+/* El div del mapa de Leaflet debe ocupar todo el alto */
+.radar-map {
+  width: 100% !important;
+  height: 480px !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+/* Máscara radial sobre el mapa */
+.radar-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Permite interactuar con el mapa */
+  z-index: 10;
+  background: radial-gradient(
+    circle at center,
+    transparent 0px,
+    transparent 180px,
+    rgba(15, 23, 42, 0.88) 181px,
+    rgba(15, 23, 42, 0.98) 100%
+  );
+}
+
+/* Anillo neón central */
+.radar-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 362px;
+  height: 362px;
+  transform: translate(-50%, -50%);
+  border: 2px solid #6366f1;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 11;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.4), inset 0 0 10px rgba(99, 102, 241, 0.2);
+}

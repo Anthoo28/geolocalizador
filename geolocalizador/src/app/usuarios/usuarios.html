@@ -1,0 +1,194 @@
+<div class="flex h-screen bg-gray-100 overflow-hidden font-sans">
+
+  <!-- BARRA LATERAL REUTILIZABLE -->
+  <app-sidebar></app-sidebar>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="flex-1 bg-gray-100 overflow-y-auto flex flex-col p-6 lg:p-10">
+
+    <!-- SELECTOR SUPERIOR PARA ALTERNAR ENTRE LAS VISTAS DE LAS IMÁGENES -->
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <span class="text-xs font-bold text-indigo-700 tracking-wider uppercase mb-1 block">
+          {{ pestanaPrincipal === 'usuarios' ? '8. GESTIÓN DE USUARIOS' : '9. ROLES Y PERMISOS' }}
+        </span>
+        <h1 class="text-xl font-bold text-gray-900">
+          {{ pestanaPrincipal === 'usuarios' ? 'Gestión de Usuarios y Accesos' : 'Control de Roles' }}
+        </h1>
+      </div>
+
+      <!-- Botones para alternar entre la vista 8 y la vista 9 -->
+      <div class="bg-white p-1 rounded-xl border border-gray-200 flex gap-1 shadow-sm">
+        <button 
+          (click)="pestanaPrincipal = 'usuarios'"
+          [class]="pestanaPrincipal === 'usuarios' ? 'bg-indigo-600 text-white font-semibold' : 'text-gray-600 hover:bg-gray-100'"
+          class="px-4 py-2 rounded-lg text-xs transition cursor-pointer">
+          8. Usuarios
+        </button>
+        <button 
+          (click)="pestanaPrincipal = 'roles'"
+          [class]="pestanaPrincipal === 'roles' ? 'bg-indigo-600 text-white font-semibold' : 'text-gray-600 hover:bg-gray-100'"
+          class="px-4 py-2 rounded-lg text-xs transition cursor-pointer">
+          9. Roles y Permisos
+        </button>
+      </div>
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- VISTA 8: GESTIÓN DE USUARIOS                      -->
+    <!-- ================================================= -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 lg:p-8 flex-1 flex flex-col" *ngIf="pestanaPrincipal === 'usuarios'">
+      
+      <!-- Cabecera de la tabla y botón Nuevo Usuario -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <h2 class="text-base font-bold text-gray-900">Usuarios</h2>
+        
+        <div class="flex items-center gap-3">
+          <!-- Buscador -->
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">🔍</span>
+            <input 
+              type="text" 
+              [(ngModel)]="filtroBusqueda" 
+              placeholder="Buscar usuario..." 
+              class="w-64 bg-gray-50 border border-gray-200 rounded-xl pl-9 pr-4 py-2 text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          
+          <!-- Filtros -->
+          <button class="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-medium text-gray-600 hover:bg-gray-100 cursor-pointer">
+            ⚙️ Filtros
+          </button>
+
+          <!-- Botón Nuevo Usuario -->
+          <button (click)="nuevoUsuario()" class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-xl shadow-sm transition cursor-pointer">
+            + Nuevo usuario
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabla de Usuarios -->
+      <div class="overflow-x-auto flex-1">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-gray-200 text-gray-400 text-[11px] font-semibold uppercase tracking-wider">
+              <th class="py-3 px-4">Nombre</th>
+              <th class="py-3 px-4">Correo</th>
+              <th class="py-3 px-4">Rol</th>
+              <th class="py-3 px-4">Estado</th>
+              <th class="py-3 px-4 text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 text-xs text-gray-700">
+            <tr *ngFor="let u of usuarios" class="hover:bg-gray-50/50 transition">
+              <td class="py-4 px-4 font-semibold text-gray-900">{{ u.nombre }}</td>
+              <td class="py-4 px-4 text-gray-500">{{ u.correo }}</td>
+              <td class="py-4 px-4">{{ u.rol }}</td>
+              <td class="py-4 px-4">
+                <span [class]="u.estado === 'Activo' ? 'px-2.5 py-1 bg-emerald-50 text-emerald-700 font-semibold rounded-full text-[10px]' : 'px-2.5 py-1 bg-rose-50 text-rose-700 font-semibold rounded-full text-[10px]'">
+                  {{ u.estado }}
+                </span>
+              </td>
+              <td class="py-4 px-4 text-center">
+                <div class="flex items-center justify-center gap-3">
+                  <button title="Editar" class="text-gray-400 hover:text-indigo-600 cursor-pointer">✏️</button>
+                  <button title="Eliminar" class="text-gray-400 hover:text-rose-600 cursor-pointer">🗑️</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación inferior -->
+      <div class="flex items-center justify-end gap-2 pt-4 border-t border-gray-100 text-xs">
+        <span class="w-7 h-7 flex items-center justify-center rounded-lg bg-indigo-600 text-white font-bold cursor-pointer">1</span>
+        <span class="w-7 h-7 flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100 cursor-pointer">2</span>
+        <span class="w-7 h-7 flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100 cursor-pointer">3</span>
+      </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- VISTA 9: ROLES Y PERMISOS                         -->
+    <!-- ================================================= -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 lg:p-8 flex-1 flex flex-col" *ngIf="pestanaPrincipal === 'roles'">
+
+      <!-- Pestañas internas superiores (Roles / Permisos) -->
+      <div class="flex border-b border-gray-200 mb-6 gap-8">
+        <button 
+          (click)="pestanaRoles = 'roles'"
+          [class]="pestanaRoles === 'roles' ? 'border-indigo-600 text-indigo-600 font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700'"
+          class="pb-3 border-b-2 text-sm transition cursor-pointer">
+          Roles
+        </button>
+        <button 
+          (click)="pestanaRoles = 'permisos'"
+          [class]="pestanaRoles === 'permisos' ? 'border-indigo-600 text-indigo-600 font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700'"
+          class="pb-3 border-b-2 text-sm transition cursor-pointer">
+          Permisos
+        </button>
+      </div>
+
+      <!-- Grid Principal Dividido (Lista de Roles a la izquierda, Permisos a la derecha) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1">
+
+        <!-- Columna Izquierda: Lista de Roles -->
+        <div class="lg:col-span-5 space-y-4">
+          <h3 class="text-sm font-bold text-gray-900">Roles</h3>
+
+          <div class="space-y-2">
+            <div 
+              *ngFor="let rol of roles"
+              (click)="seleccionarRol(rol)"
+              [class]="rolSelectedEqual(rol) ? 'bg-indigo-50/70 border-indigo-300 shadow-sm' : 'bg-white border-gray-200 hover:bg-gray-50'"
+              class="p-4 rounded-xl border transition cursor-pointer flex flex-col gap-1">
+              <span class="text-xs font-bold text-gray-800">{{ rol.nombre }}</span>
+              <span class="text-[11px] text-gray-500">{{ rol.tipo }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna Derecha: Permisos del Rol Seleccionado -->
+        <div class="lg:col-span-7 bg-gray-50/50 border border-gray-200 rounded-2xl p-6 flex flex-col justify-between">
+          
+          <div class="space-y-6">
+            <h3 class="text-sm font-bold text-gray-800">Permisos del rol: <span class="text-indigo-600">{{ rolSeleccionado.nombre }}</span></h3>
+
+            <!-- Sección: Incidencias -->
+            <div class="bg-white p-5 rounded-xl border border-gray-200 space-y-3 shadow-sm">
+              <h4 class="text-xs font-bold text-gray-700 mb-2">Incidencias</h4>
+              
+              <div *ngFor="let permiso of permisosIncidencias" class="flex items-center gap-3">
+                <input type="checkbox" [(ngModel)]="permiso.activo" class="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500 cursor-pointer">
+                <label class="text-xs text-gray-700 cursor-pointer">{{ permiso.nombre }}</label>
+              </div>
+            </div>
+
+            <!-- Sección: Reportes -->
+            <div class="bg-white p-5 rounded-xl border border-gray-200 space-y-3 shadow-sm">
+              <h4 class="text-xs font-bold text-gray-700 mb-2">Reportes</h4>
+              
+              <div *ngFor="let permiso of permisosReportes" class="flex items-center gap-3">
+                <input type="checkbox" [(ngModel)]="permiso.activo" class="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500 cursor-pointer">
+                <label class="text-xs text-gray-700 cursor-pointer">{{ permiso.nombre }}</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botón inferior Guardar Cambios -->
+          <div class="flex justify-end pt-6 mt-6 border-t border-gray-200">
+            <button (click)="guardarCambiosRoles()" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-xl shadow-sm transition cursor-pointer">
+              Guardar cambios
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+</div>
