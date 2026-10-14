@@ -4,11 +4,12 @@ import { SidebarComponent } from '../sidebar/sidebar';
 import { timeout } from 'rxjs/operators';
 import { DashboardService, DashboardMetricasResponse } from '../services/dashboard';
 import Chart from 'chart.js/auto';
+import { HeaderComponent } from '../components/header/header';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, SidebarComponent],
+  imports: [CommonModule, SidebarComponent, HeaderComponent],
   templateUrl: './dashboard-principal.html',
   styleUrl: './dashboard-principal.css'
 })

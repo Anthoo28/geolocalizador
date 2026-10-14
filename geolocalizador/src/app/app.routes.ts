@@ -7,6 +7,7 @@ import { NuevaIncidenciaComponent } from './crear-incidencia/crear-incidencia';
 import { DetalleIncidenciaComponent } from './detalle-incidencia/detalle-incidencia';
 import { ReportesComponent } from './reportes/reportes';
 import { UsuariosComponent } from './usuarios/usuarios';
+import { authGuard } from './guards/auth.guard'; // 👈 Asegúrate de ajustar la ruta según dónde hayas creado tu guard
 
 export const routes: Routes = [
   {
@@ -20,31 +21,38 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard',
-    component: DashboardPrincipalComponent
+    component: DashboardPrincipalComponent,
+    canActivate: [authGuard] // 🔒 Protegido
   },
   {
     path: 'incidencias',
-    component: Incidencia
+    component: Incidencia,
+    canActivate: [authGuard] // 🔒 Protegido
   },
   {
     path: 'mapa',
-    component: MapaInteractivoComponent
+    component: MapaInteractivoComponent,
+    canActivate: [authGuard] // 🔒 Protegido
   },
   {
     path: 'nueva-incidencia',
-    component: NuevaIncidenciaComponent
+    component: NuevaIncidenciaComponent,
+    canActivate: [authGuard] // 🔒 Protegido
   },
   {
-    path: 'detalle-incidencia/:id', // Recibe el ID de la incidencia seleccionada
-    component: DetalleIncidenciaComponent
+    path: 'detalle-incidencia/:id', 
+    component: DetalleIncidenciaComponent,
+    canActivate: [authGuard] // 🔒 Protegido
   },
   {
     path: 'reportes',
-    component: ReportesComponent
+    component: ReportesComponent,
+    canActivate: [authGuard] // 🔒 Protegido
   },
   {
     path: 'usuarios',
-    component: UsuariosComponent
+    component: UsuariosComponent,
+    canActivate: [authGuard] // 🔒 Protegido
   },
   {
     path: '**',

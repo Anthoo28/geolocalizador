@@ -71,9 +71,10 @@ export class MapaInteractivoComponent implements OnInit, AfterViewInit {
       zoomControl: false
     }).setView([-14.0677, -75.7286], 15);
 
+    // 🟢 Capa base oficial de OpenStreetMap con cobertura total garantizada
     this.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      attribution: '© OpenStreetMap contributors'
+      attribution: '&copy; OpenStreetMap contributors'
     }).addTo(this.map);
 
     this.markersLayer = this.L.layerGroup().addTo(this.map);
@@ -181,7 +182,6 @@ export class MapaInteractivoComponent implements OnInit, AfterViewInit {
           this.incidenciaSeleccionada = { ...inc }; 
           this.cdr.markForCheck();
           this.cdr.detectChanges();
-          console.log('Incidencia seleccionada:', this.incidenciaSeleccionada);
         });
 
         this.markersLayer.addLayer(marker);
@@ -205,7 +205,7 @@ export class MapaInteractivoComponent implements OnInit, AfterViewInit {
       return coincideTipo && coincideFecha;
     });
 
-    this.totalIncidencias = this.incidenciasFiltradas.length; // Actualizar contador al filtrar
+    this.totalIncidencias = this.incidenciasFiltradas.length; 
     this.pintarMarcadores();
     this.incidenciaSeleccionada = null; 
   }
@@ -215,7 +215,7 @@ export class MapaInteractivoComponent implements OnInit, AfterViewInit {
     this.filtroFechaInicio = '';
     this.filtroFechaFin = '';
     this.incidenciasFiltradas = [...this.incidencias];
-    this.totalIncidencias = this.incidenciasFiltradas.length; // Actualizar contador al limpiar filtros
+    this.totalIncidencias = this.incidenciasFiltradas.length; 
     this.pintarMarcadores();
     this.incidenciaSeleccionada = null;
   }
