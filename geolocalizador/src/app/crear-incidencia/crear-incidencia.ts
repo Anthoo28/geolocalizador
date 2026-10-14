@@ -1,8 +1,7 @@
-import { Component, NgZone, ChangeDetectorRef } from '@angular/core';
+import { Component, NgZone, ChangeDetectorRef, afterNextRender, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
-import { AfterViewInit, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { ApiService } from '../api.service';
 
@@ -13,7 +12,7 @@ import { ApiService } from '../api.service';
   templateUrl: './crear-incidencia.html',
   styleUrl: './crear-incidencia.css',
 })
-export class NuevaIncidenciaComponent implements OnInit, AfterViewInit {
+export class NuevaIncidenciaComponent {
 
   tabActiva: string = 'general';
 
@@ -22,12 +21,12 @@ export class NuevaIncidenciaComponent implements OnInit, AfterViewInit {
     titulo: '',
     tipoDelito: 'ROBO',
     descripcion: '',
-    fechaHora: '2026-05-21T14:30',
+    fechaHora: '', 
     prioridad: 'ALTA',
     direccion: '',
     referencia: '',
-    sector: '',       // ID del sector seleccionado
-    comisaria: '',    // ID de la comisaría seleccionada
+    sector: '',      // ID del sector seleccionado
+    comisaria: '',   // ID de la comisaría seleccionada
     latitud: -14.0678,
     longitud: -75.7286
   };
@@ -45,46 +44,70 @@ export class NuevaIncidenciaComponent implements OnInit, AfterViewInit {
     private router: Router,
     private zone: NgZone,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) { 
+    // Asignamos la fecha y hora actual por defecto
+    this.incidencia.fechaHora = this.obtenerFechaHoraActual();
 
-  ngOnInit(): void {
-    this.cargarCatalogos();
+    // afterNextRender garantiza que los llamados a la API y el mapa 
+    // ocurran EXCLUSIVAMENTE en el navegador, con el token listo.
+    afterNextRender(() => {
+      this.cargarCatalogos();
+    });
+  }
+
+  private obtenerFechaHoraActual(): string {
+    const ahora = new Date();
+    const anio = ahora.getFullYear();
+    const mes = String(ahora.getMonth() + 1).padStart(2, '0');
+    const dia = String(ahora.getDate()).padStart(2, '0');
+    const hora = String(ahora.getHours()).padStart(2, '0');
+    const minutos = String(ahora.getMinutes()).padStart(2, '0');
+    return `${anio}-${mes}-${dia}T${hora}:${minutos}`;
   }
 
   cargarCatalogos(): void {
     this.apiService.obtenerSectores().subscribe({
       next: (response: any) => {
-        if (Array.isArray(response)) {
-          this.sectores = response;
-        } else if (response && Array.isArray(response.data)) {
-          this.sectores = response.data;
-        } else {
-          this.sectores = [];
-        }
+        this.zone.run(() => {
+          if (Array.isArray(response)) {
+            this.sectores = response;
+          } else if (response && Array.isArray(response.data)) {
+            this.sectores = response.data;
+          } else {
+            this.sectores = [];
+          }
+          this.cdr.detectChanges();
+        });
       },
       error: (err: any) => console.error('Error al cargar sectores:', err)
     });
 
     this.apiService.obtenerComisarias().subscribe({
       next: (response: any) => {
-        if (Array.isArray(response)) {
-          this.comisarias = response;
-        } else if (response && Array.isArray(response.data)) {
-          this.comisarias = response.data;
-        } else {
-          this.comisarias = [];
-        }
+        this.zone.run(() => {
+          if (Array.isArray(response)) {
+            this.comisarias = response;
+          } else if (response && Array.isArray(response.data)) {
+            this.comisarias = response.data;
+          } else {
+            this.comisarias = [];
+          }
+          this.cdr.detectChanges();
+        });
       },
       error: (err: any) => console.error('Error al cargar comisarías:', err)
     });
+
+    // Inicializamos también el mapa de forma segura en el cliente
+    if (isPlatformBrowser(this.platformId)) {
+      this.initLeafletMap();
+    }
   }
 
-  async ngAfterViewInit(): Promise<void> {
-    if (isPlatformBrowser(this.platformId)) {
-      const leafletModule = await import('leaflet');
-      this.L = leafletModule.default || leafletModule;
-      this.initMiniMap();
-    }
+  private async initLeafletMap(): Promise<void> {
+    const leafletModule = await import('leaflet');
+    this.L = leafletModule.default || leafletModule;
+    this.initMiniMap();
   }
 
   private initMiniMap(): void {
@@ -96,7 +119,6 @@ export class NuevaIncidenciaComponent implements OnInit, AfterViewInit {
       shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
     });
 
-    // Se usa setTimeout para asegurar que el DOM calcule el tamaño antes de pintar el mapa
     setTimeout(() => {
       this.map = this.L.map('mini-map', {
         zoomControl: true
@@ -111,19 +133,16 @@ export class NuevaIncidenciaComponent implements OnInit, AfterViewInit {
         draggable: true
       }).addTo(this.map);
 
-      // Evento en tiempo real al arrastrar el marcador
       this.marker.on('drag', (event: any) => {
         const position = event.target.getLatLng();
         this.actualizarCoordenadas(position.lat, position.lng);
       });
 
-      // Evento al soltar el marcador
       this.marker.on('dragend', (event: any) => {
         const position = event.target.getLatLng();
         this.actualizarCoordenadas(position.lat, position.lng);
       });
 
-      // Evento al hacer clic en el mapa
       this.map.on('click', (event: any) => {
         const lat = event.latlng.lat;
         const lng = event.latlng.lng;
@@ -131,7 +150,6 @@ export class NuevaIncidenciaComponent implements OnInit, AfterViewInit {
         this.actualizarCoordenadas(lat, lng);
       });
 
-      // Fuerza a Leaflet a recalcular dimensiones para evitar el fondo gris/blanco
       this.map.invalidateSize();
     }, 150);
   }
@@ -140,7 +158,7 @@ export class NuevaIncidenciaComponent implements OnInit, AfterViewInit {
     this.zone.run(() => {
       this.incidencia.latitud = Number(lat.toFixed(6));
       this.incidencia.longitud = Number(lng.toFixed(6));
-      this.cdr.detectChanges(); // Fuerza el refresco inmediato de los inputs en la interfaz
+      this.cdr.detectChanges();
     });
   }
 

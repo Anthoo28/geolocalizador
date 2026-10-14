@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gray-50 flex flex-col p-6 lg:p-10 font-sans">
+<div class="min-h-screen bg-gray-50 flex flex-col p-6 lg:p-10 font-sans" *ngIf="incidencia; else loadingTemplate">
 
   <!-- CABECERA SUPERIOR: 6. DETALLE DE INCIDENCIA -->
   <div class="mb-6">
@@ -6,18 +6,39 @@
     
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-200">
       <div class="flex items-center gap-4">
-        <button routerLink="/mapa" class="text-sm font-medium text-gray-500 hover:text-gray-800 flex items-center gap-1 cursor-pointer">
+        <button routerLink="/incidencias" class="text-sm font-medium text-gray-500 hover:text-gray-800 flex items-center gap-1 cursor-pointer">
           ← Volver
         </button>
-        <h1 class="text-lg font-bold text-gray-900">{{ incidencia.codigo }}</h1>
-        <span class="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-semibold rounded-full">
-          {{ incidencia.estado }}
+        <h1 class="text-lg font-bold text-gray-900">{{ incidencia?.codigo }}</h1>
+        
+        <!-- Estado dinámico (Badge en vista / Select en edición) -->
+        <span *ngIf="!isEditing" class="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-semibold rounded-full">
+          {{ incidencia?.estado }}
         </span>
+        <select *ngIf="isEditing" [(ngModel)]="incidencia.estado" class="border border-gray-300 rounded-lg px-2 py-1 text-xs bg-white font-semibold">
+          <option value="REGISTRADA">REGISTRADA</option>
+          <option value="EN_ATENCION">EN ATENCIÓN</option>
+          <option value="ATENDIDA">ATENDIDA</option>
+          <option value="CANCELADA">CANCELADA</option>
+        </select>
       </div>
       
-      <button (click)="editarIncidencia()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-xl flex items-center gap-2 cursor-pointer shadow-sm">
-        <i class="fa-solid fa-pen-to-square"></i> Editar
-      </button>
+      <!-- Botones dinámicos de acción -->
+      <div class="flex gap-2" *ngIf="!isEditing; else editingButtons">
+        <button (click)="editarIncidencia()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-xl flex items-center gap-2 cursor-pointer shadow-sm">
+          <i class="fa-solid fa-pen-to-square"></i> Editar
+        </button>
+      </div>
+      <ng-template #editingButtons>
+        <div class="flex gap-2">
+          <button (click)="editarIncidencia()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-medium rounded-xl cursor-pointer">
+            Cancelar
+          </button>
+          <button (click)="guardarCambios()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-xl flex items-center gap-2 cursor-pointer shadow-sm">
+            <i class="fa-solid fa-check"></i> Guardar cambios
+          </button>
+        </div>
+      </ng-template>
     </div>
   </div>
 
@@ -28,59 +49,84 @@
     <div class="lg:col-span-6 bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-4">
       <h2 class="text-sm font-bold text-gray-800 mb-2">Información general</h2>
 
-      <div class="grid grid-cols-3 gap-2 text-xs">
+      <div class="grid grid-cols-3 gap-2 text-xs items-center">
         <span class="text-gray-500 font-medium">Tipo:</span>
-        <span class="col-span-2 text-gray-800 font-semibold">{{ incidencia.tipo }}</span>
+        <span class="col-span-2 text-gray-800 font-semibold">{{ incidencia?.tipoDelito || incidencia?.tipo }}</span>
       </div>
 
-      <div class="grid grid-cols-3 gap-2 text-xs">
+      <!-- TÍTULO -->
+      <div class="grid grid-cols-3 gap-2 text-xs items-center">
         <span class="text-gray-500 font-medium">Título:</span>
-        <span class="col-span-2 text-gray-800 font-semibold">{{ incidencia.titulo }}</span>
+        <div class="col-span-2">
+          <span *ngIf="!isEditing" class="text-gray-800 font-semibold">{{ incidencia?.titulo }}</span>
+          <input *ngIf="isEditing" [(ngModel)]="incidencia.titulo" type="text" class="w-full border border-gray-300 rounded-lg p-1.5 text-xs">
+        </div>
       </div>
 
-      <div class="grid grid-cols-3 gap-2 text-xs">
+      <!-- DESCRIPCIÓN -->
+      <div class="grid grid-cols-3 gap-2 text-xs items-center">
         <span class="text-gray-500 font-medium">Descripción:</span>
-        <span class="col-span-2 text-gray-700 leading-relaxed">{{ incidencia.descripcion }}</span>
+        <div class="col-span-2">
+          <span *ngIf="!isEditing" class="text-gray-700 leading-relaxed">{{ incidencia?.descripcion }}</span>
+          <textarea *ngIf="isEditing" [(ngModel)]="incidencia.descripcion" rows="3" class="w-full border border-gray-300 rounded-lg p-1.5 text-xs"></textarea>
+        </div>
       </div>
 
-      <div class="grid grid-cols-3 gap-2 text-xs">
+      <div class="grid grid-cols-3 gap-2 text-xs items-center">
         <span class="text-gray-500 font-medium">Fecha y hora:</span>
-        <span class="col-span-2 text-gray-800">{{ incidencia.fechaHora }}</span>
+        <span class="col-span-2 text-gray-800">{{ incidencia?.fechaHora | date:'dd/MM/yyyy HH:mm' }}</span>
       </div>
 
-      <div class="grid grid-cols-3 gap-2 text-xs">
+      <!-- DIRECCIÓN -->
+      <div class="grid grid-cols-3 gap-2 text-xs items-center">
         <span class="text-gray-500 font-medium">Dirección:</span>
-        <span class="col-span-2 text-gray-800">{{ incidencia.direccion }}</span>
+        <div class="col-span-2">
+          <span *ngIf="!isEditing" class="text-gray-800">{{ incidencia?.direccion }}</span>
+          <input *ngIf="isEditing" [(ngModel)]="incidencia.direccion" type="text" class="w-full border border-gray-300 rounded-lg p-1.5 text-xs">
+        </div>
       </div>
 
-      <div class="grid grid-cols-3 gap-2 text-xs">
+      <!-- REFERENCIA -->
+      <div class="grid grid-cols-3 gap-2 text-xs items-center">
         <span class="text-gray-500 font-medium">Referencia:</span>
-        <span class="col-span-2 text-gray-800">{{ incidencia.referencia }}</span>
+        <div class="col-span-2">
+          <span *ngIf="!isEditing" class="text-gray-800">{{ incidencia?.referencia }}</span>
+          <input *ngIf="isEditing" [(ngModel)]="incidencia.referencia" type="text" class="w-full border border-gray-300 rounded-lg p-1.5 text-xs">
+        </div>
       </div>
 
-      <div class="grid grid-cols-3 gap-2 text-xs">
+      <div class="grid grid-cols-3 gap-2 text-xs items-center">
         <span class="text-gray-500 font-medium">Sector:</span>
-        <span class="col-span-2 text-gray-800">{{ incidencia.sector }}</span>
+        <span class="col-span-2 text-gray-800">{{ incidencia?.sector?.nombre || 'No asignado' }}</span>
       </div>
 
-      <div class="grid grid-cols-3 gap-2 text-xs">
+      <div class="grid grid-cols-3 gap-2 text-xs items-center">
         <span class="text-gray-500 font-medium">Comisaría:</span>
-        <span class="col-span-2 text-gray-800">{{ incidencia.comisaria }}</span>
+        <span class="col-span-2 text-gray-800">{{ incidencia?.comisaria?.nombre || 'No asignada' }}</span>
       </div>
 
-      <div class="grid grid-cols-3 gap-2 text-xs">
+      <div class="grid grid-cols-3 gap-2 text-xs items-center">
         <span class="text-gray-500 font-medium">Registrado por:</span>
-        <span class="col-span-2 text-gray-800">{{ incidencia.registradoPor }}</span>
+        <span class="col-span-2 text-gray-800">{{ incidencia?.registradoPor?.nombre }} {{ incidencia?.registradoPor?.apellido }}</span>
       </div>
 
-      <div class="grid grid-cols-3 gap-2 text-xs">
+      <div class="grid grid-cols-3 gap-2 text-xs items-center">
         <span class="text-gray-500 font-medium">Asignado a:</span>
-        <span class="col-span-2 text-gray-800">{{ incidencia.asignadoA }}</span>
+        <span class="col-span-2 text-gray-800">{{ incidencia?.asignadoA?.nombre ? (incidencia.asignadoA.nombre + ' ' + (incidencia.asignadoA.apellido || '')) : 'No asignado' }}</span>
       </div>
 
-      <div class="grid grid-cols-3 gap-2 text-xs">
+      <!-- PRIORIDAD -->
+      <div class="grid grid-cols-3 gap-2 text-xs items-center">
         <span class="text-gray-500 font-medium">Prioridad:</span>
-        <span class="col-span-2 text-red-600 font-bold">{{ incidencia.prioridad }}</span>
+        <div class="col-span-2">
+          <span *ngIf="!isEditing" class="text-red-600 font-bold">{{ incidencia?.prioridad }}</span>
+          <select *ngIf="isEditing" [(ngModel)]="incidencia.prioridad" class="w-full border border-gray-300 rounded-lg p-1.5 text-xs bg-white font-semibold">
+            <option value="BAJA">BAJA</option>
+            <option value="MEDIA">MEDIA</option>
+            <option value="ALTA">ALTA</option>
+            <option value="URGENTE">URGENTE</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -96,36 +142,46 @@
       <!-- EVIDENCIAS -->
       <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-3">
         <div class="flex items-center justify-between">
-          <h2 class="text-sm font-bold text-gray-800">Evidencias (2)</h2>
-          <button class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold cursor-pointer">Ver todas</button>
+          <h2 class="text-sm font-bold text-gray-800">Evidencias ({{ incidencia?.evidencias?.length || 0 }})</h2>
         </div>
-        <div class="grid grid-cols-2 gap-4">
-          <div class="h-28 bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
-            <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=400&q=80" alt="Evidencia 1" class="w-full h-full object-cover">
-          </div>
-          <div class="h-28 bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
-            <img src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=400&q=80" alt="Evidencia 2" class="w-full h-full object-cover">
+        <div class="grid grid-cols-2 gap-4" *ngIf="incidencia?.evidencias?.length > 0; else sinEvidencias">
+          <div *ngFor="let img of incidencia.evidencias" class="h-28 bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
+            <img [src]="img" alt="Evidencia" class="w-full h-full object-cover">
           </div>
         </div>
+        <ng-template #sinEvidencias>
+          <p class="text-xs text-gray-400 italic">No hay evidencias registradas para esta incidencia.</p>
+        </ng-template>
       </div>
 
       <!-- HISTORIAL DE ESTADOS -->
       <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-4">
         <h2 class="text-sm font-bold text-gray-800">Historial de estados</h2>
         
-        <div class="space-y-3">
-          <div *ngFor="let h of incidencia.historial" class="flex items-center justify-between text-xs border-b border-gray-100 pb-2.5">
+        <div class="space-y-3" *ngIf="incidencia?.historialEstados?.length > 0; else sinHistorial">
+          <div *ngFor="let h of incidencia.historialEstados" class="flex items-center justify-between text-xs border-b border-gray-100 pb-2.5">
             <div class="flex items-center gap-2.5">
-              <span [class]="h.estado === 'Registrada' ? 'w-2.5 h-2.5 rounded-full bg-purple-600' : 'w-2.5 h-2.5 rounded-full bg-amber-500'"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-purple-600"></span>
               <span class="font-semibold text-gray-800">{{ h.estado }}</span>
             </div>
-            <span class="text-gray-500">{{ h.fecha }}</span>
-            <span class="text-gray-700 font-medium">{{ h.autor }}</span>
+            <span class="text-gray-500">{{ h.fecha | date:'dd/MM/yyyy HH:mm' }}</span>
+            <span class="text-gray-700 font-medium">{{ h.usuario?.nombre }} {{ h.usuario?.apellido }}</span>
           </div>
         </div>
+        <ng-template #sinHistorial>
+          <p class="text-xs text-gray-400 italic">Sin historial disponible.</p>
+        </ng-template>
       </div>
 
     </div>
 
   </div>
 </div>
+
+<!-- Plantilla de carga mientras responde el backend en Render -->
+<ng-template #loadingTemplate>
+  <div class="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+    <div class="spinner-border text-indigo-600 animate-spin w-10 h-10 border-4 border-current border-t-transparent rounded-full" role="status"></div>
+    <p class="mt-4 text-sm font-medium text-gray-600">Cargando detalles de la incidencia...</p>
+  </div>
+</ng-template>

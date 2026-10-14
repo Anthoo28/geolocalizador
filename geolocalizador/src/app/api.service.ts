@@ -33,6 +33,10 @@ export class ApiService {
     return this.http.get(`${this.apiUrl}/incidencias/${id}`); //[cite: 6]
   }
 
+  actualizarIncidencia(id: string, data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/incidencias/${id}`, data); //[cite: 6]
+  }
+
   buscarIncidenciasCercanas(lat: number, lng: number, radioMetros: number = 3000): Observable<any> {
     const params = new HttpParams()
       .set('lat', lat.toString())

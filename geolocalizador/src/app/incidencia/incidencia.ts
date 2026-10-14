@@ -69,6 +69,10 @@ toggleFiltrosMenu(event?: MouseEvent): void {
     this.mostrarFiltrosMenu = !this.mostrarFiltrosMenu;
     this.cdr.detectChanges();
   }
+  verDetalle(inc: any) {
+  console.log('Objeto incidencia seleccionado:', inc);
+  // Aquí puedes ver si usas inc._id o inc.codigo
+}
 
   filtrar(): void {
     const term = this.searchTerm.toLowerCase().trim();
