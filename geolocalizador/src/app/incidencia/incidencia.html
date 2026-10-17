@@ -54,7 +54,7 @@
               <span *ngIf="filtroEstadoSeleccionado" class="w-2 h-2 rounded-full bg-indigo-600"></span>
             </button>
 
-            <!-- MENÚ DESPLEGABLE DE FILTROS -->
+            <!-- MENÚ DESPLEGABLE -->
             <div *ngIf="mostrarFiltrosMenu" class="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-xl z-50 py-2">
               <div class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Filtrar por Estado</div>
               <button type="button" (click)="seleccionarFiltroEstado('')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 cursor-pointer">Todos</button>
@@ -71,7 +71,7 @@
         </div>
       </div>
 
-      <!-- TABLA DE INCIDENCIAS -->
+      <!-- TABLA -->
       <div class="bg-white rounded-lg shadow-sm overflow-hidden">
         <table class="w-full text-sm text-left">
 
@@ -120,23 +120,10 @@
                 {{ inc.tipoDelito | lowercase }}
               </td>
 
-              <!-- COLUMNA DE ESTADO INTERACTIVO (<select>) -->
               <td class="px-6 py-4">
-                <select 
-                  [(ngModel)]="inc.estado" 
-                  (change)="actualizarEstadoRapido(inc)"
-                  [ngClass]="{
-                    'bg-amber-100 text-amber-800 border-amber-300': inc.estado === 'REGISTRADA' || inc.estado === 'Registrada',
-                    'bg-blue-100 text-blue-800 border-blue-300': inc.estado === 'EN_ATENCION' || inc.estado === 'En atención',
-                    'bg-emerald-100 text-emerald-800 border-emerald-300': inc.estado === 'ATENDIDA' || inc.estado === 'Atendida',
-                    'bg-rose-100 text-rose-800 border-rose-300': inc.estado === 'CANCELADA' || inc.estado === 'Cancelada'
-                  }"
-                  class="px-3 py-1 text-xs font-semibold rounded-full border cursor-pointer focus:outline-none shadow-2xs transition">
-                  <option value="REGISTRADA">Registrada</option>
-                  <option value="EN_ATENCION">En atención</option>
-                  <option value="ATENDIDA">Atendida</option>
-                  <option value="CANCELADA">Cancelada</option>
-                </select>
+                <span [class]="'px-3 py-1 text-xs font-semibold rounded-full inline-block ' + obtenerClaseEstado(inc.estado)">
+                  {{ formatearEstado(inc.estado) }}
+                </span>
               </td>
 
               <td class="px-6 py-4 text-gray-600">
