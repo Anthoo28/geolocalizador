@@ -13,8 +13,8 @@
         3. MAPA INTERACTIVO - ICA, PERÚ
       </h1>
       <h1 class="text-sm font-bold text-slate-800 bg-white/95 backdrop-blur-md px-4 py-2 rounded-xl shadow-sm border border-slate-200/80 pointer-events-auto">
-  {{ totalIncidencias }} INCIDENCIAS - MAPA INTERACTIVO - ICA, PERÚ
-</h1>
+        {{ totalIncidencias }} INCIDENCIAS - MAPA INTERACTIVO - ICA, PERÚ
+      </h1>
 
       <div class="flex items-center gap-4 pointer-events-auto">
         <div class="relative hidden md:block w-72">
@@ -33,7 +33,7 @@
         </button>
 
         <div class="flex items-center gap-3 bg-white/95 backdrop-blur-md border border-slate-200/85 px-3 py-1.5 rounded-xl shadow-sm">
-          <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs">
+          <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs overflow-hidden">
             <img src="https://ui-avatars.com/api/?name=Juan+Perez&background=e0e7ff&color=4338ca" alt="Usuario">
           </div>
           <div class="flex flex-col">
@@ -82,6 +82,27 @@
     <div class="absolute left-6 top-24 w-72 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200/80 p-4 z-[1000] space-y-3">
       <h2 class="text-xs font-bold text-slate-800">Filtros</h2>
       
+      <!-- SELECTOR DE VISTA (MARCADORES VS MAPA DE CALOR) -->
+      <div class="space-y-1">
+        <label class="text-[11px] font-medium text-slate-500">Vista del mapa</label>
+        <div class="grid grid-cols-2 gap-1 bg-slate-100 p-1 rounded-xl">
+          <button 
+            type="button"
+            (click)="cambiarModoMapa('marcadores')"
+            [class]="modoMapa === 'marcadores' ? 'bg-white text-indigo-600 font-bold shadow-sm' : 'text-slate-500 hover:text-slate-700'"
+            class="py-1.5 text-[11px] rounded-lg transition text-center cursor-pointer">
+            Marcadores
+          </button>
+          <button 
+            type="button"
+            (click)="cambiarModoMapa('calor')"
+            [class]="modoMapa === 'calor' ? 'bg-white text-indigo-600 font-bold shadow-sm' : 'text-slate-500 hover:text-slate-700'"
+            class="py-1.5 text-[11px] rounded-lg transition text-center cursor-pointer">
+            Mapa de Calor
+          </button>
+        </div>
+      </div>
+
       <div class="space-y-1">
         <label class="text-[11px] font-medium text-slate-500">Desde / Hasta</label>
         <div class="flex items-center gap-1">
@@ -92,9 +113,11 @@
 
       <div class="space-y-1">
         <label class="text-[11px] font-medium text-slate-500">Tipo de incidencia</label>
-        <select [(ngModel)]="filtroTipo" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-[11px] text-slate-700">
+        <select [(ngModel)]="filtroTipo" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-[11px] text-slate-700 cursor-pointer">
           <option value="Todos">Todos</option>
-          <option *ngFor="let tipo of tiposDelitoDisponibles" [value]="tipo">{{ tipo }}</option>
+          @for (tipo of tiposDelitoDisponibles; track tipo) {
+            <option [value]="tipo">{{ tipo }}</option>
+          }
         </select>
       </div>
 
@@ -105,12 +128,24 @@
     </div>
 
     <!-- ================= LEYENDA FLOTANTE INFERIOR IZQUIERDA ================= -->
-    <div class="absolute left-6 bottom-6 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200/80 p-3.5 w-40 z-[1000] space-y-2">
+    <div class="absolute left-6 bottom-6 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200/80 p-3.5 w-44 z-[1000] space-y-2">
       <h3 class="text-[11px] font-bold text-slate-800">Leyenda</h3>
-      <div class="space-y-1.5 text-[11px] text-slate-600">
+      
+      <!-- Leyenda para Marcadores -->
+      <div *ngIf="modoMapa === 'marcadores'" class="space-y-1.5 text-[11px] text-slate-600">
         <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span><span>Registrado</span></div>
         <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span><span>En atención</span></div>
         <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span><span>Atendida</span></div>
+      </div>
+
+      <!-- Leyenda para Mapa de Calor -->
+      <div *ngIf="modoMapa === 'calor'" class="space-y-1 text-[11px] text-slate-600">
+        <span class="block text-[10px] text-slate-400 font-medium">Densidad de Delitos</span>
+        <div class="flex items-center justify-between text-[10px]">
+          <span>Baja</span>
+          <span>Alta</span>
+        </div>
+        <div class="w-full h-2 rounded-full bg-gradient-to-r from-blue-500 via-amber-500 to-red-500"></div>
       </div>
     </div>
 

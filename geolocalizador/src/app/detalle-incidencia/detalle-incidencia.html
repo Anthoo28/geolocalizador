@@ -1,21 +1,33 @@
 <div class="min-h-screen bg-gray-50 flex flex-col p-6 lg:p-10 font-sans" *ngIf="incidencia; else loadingTemplate">
 
-  <!-- CABECERA SUPERIOR: 6. DETALLE DE INCIDENCIA -->
+  <!-- CABECERA SUPERIOR: SECCIÓN Y ACCIONES -->
   <div class="mb-6">
-    <span class="text-xs font-bold text-indigo-700 tracking-wider uppercase mb-1 block">6. DETALLE DE INCIDENCIA</span>
+    <span class="text-xs font-bold text-indigo-700 tracking-wider uppercase mb-1.5 block">6. DETALLE DE INCIDENCIA</span>
     
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-200">
-      <div class="flex items-center gap-4">
-        <button routerLink="/incidencias" class="text-sm font-medium text-gray-500 hover:text-gray-800 flex items-center gap-1 cursor-pointer">
-          ← Volver
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
+      
+      <!-- IZQUIERDA: BOTÓN VOLVER, CÓDIGO Y BADGE DE ESTADO -->
+      <div class="flex items-center gap-4 flex-wrap">
+        <button routerLink="/incidencias" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl transition cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          Volver
         </button>
-        <h1 class="text-lg font-bold text-gray-900">{{ incidencia?.codigo }}</h1>
+        
+        <h1 class="text-xl font-bold text-gray-900 tracking-tight">{{ incidencia?.codigo }}</h1>
         
         <!-- Estado dinámico (Badge en vista / Select en edición) -->
-        <span *ngIf="!isEditing" class="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-semibold rounded-full">
-          {{ incidencia?.estado }}
-        </span>
-        <select *ngIf="isEditing" [(ngModel)]="incidencia.estado" class="border border-gray-300 rounded-lg px-2 py-1 text-xs bg-white font-semibold">
+        <div *ngIf="!isEditing">
+          <span [ngClass]="{
+            'bg-blue-100 text-blue-700 border-blue-200': incidencia?.estado === 'REGISTRADA',
+            'bg-amber-100 text-amber-700 border-amber-200': incidencia?.estado === 'EN_ATENCION' || incidencia?.estado === 'EN ATENCIÓN',
+            'bg-emerald-100 text-emerald-700 border-emerald-200': incidencia?.estado === 'ATENDIDA',
+            'bg-rose-100 text-rose-700 border-rose-200': incidencia?.estado === 'CANCELADA' || incidencia?.estado === 'CERRADA'
+          }" class="px-3 py-1 text-xs font-bold rounded-full border">
+            {{ incidencia?.estado }}
+          </span>
+        </div>
+
+        <select *ngIf="isEditing" [(ngModel)]="incidencia.estado" class="border border-indigo-300 ring-2 ring-indigo-100 rounded-xl px-3 py-1.5 text-xs bg-white font-bold text-gray-800 focus:outline-none cursor-pointer">
           <option value="REGISTRADA">REGISTRADA</option>
           <option value="EN_ATENCION">EN ATENCIÓN</option>
           <option value="ATENDIDA">ATENDIDA</option>
@@ -23,153 +35,241 @@
         </select>
       </div>
       
-      <!-- Botones dinámicos de acción -->
-      <div class="flex gap-2" *ngIf="!isEditing; else editingButtons">
-        <button (click)="editarIncidencia()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-xl flex items-center gap-2 cursor-pointer shadow-sm">
-          <i class="fa-solid fa-pen-to-square"></i> Editar
+      <!-- DERECHA: BOTONES DINÁMICOS DE ACCIÓN -->
+      <div class="flex items-center gap-2" *ngIf="!isEditing; else editingButtons">
+        <button (click)="editarIncidencia()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 cursor-pointer shadow-sm transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+          Editar incidencia
         </button>
       </div>
+
       <ng-template #editingButtons>
-        <div class="flex gap-2">
-          <button (click)="editarIncidencia()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-medium rounded-xl cursor-pointer">
+        <div class="flex items-center gap-2">
+          <button (click)="editarIncidencia()" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl cursor-pointer transition">
             Cancelar
           </button>
-          <button (click)="guardarCambios()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-xl flex items-center gap-2 cursor-pointer shadow-sm">
-            <i class="fa-solid fa-check"></i> Guardar cambios
+          <button (click)="guardarCambios()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 cursor-pointer shadow-sm transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            Guardar cambios
           </button>
         </div>
       </ng-template>
+
     </div>
   </div>
 
   <!-- GRID PRINCIPAL DE 2 COLUMNAS -->
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1">
 
     <!-- ================= COLUMNA IZQUIERDA: INFORMACIÓN GENERAL ================= -->
-    <div class="lg:col-span-6 bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-4">
-      <h2 class="text-sm font-bold text-gray-800 mb-2">Información general</h2>
-
-      <div class="grid grid-cols-3 gap-2 text-xs items-center">
-        <span class="text-gray-500 font-medium">Tipo:</span>
-        <span class="col-span-2 text-gray-800 font-semibold">{{ incidencia?.tipoDelito || incidencia?.tipo }}</span>
+    <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-6">
+      
+      <!-- CABECERA DE LA FICHA -->
+      <div class="border-b border-gray-100 pb-3 flex items-center justify-between">
+        <h2 class="text-xs font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
+          Información de la Incidencia
+        </h2>
+        <span class="text-[11px] font-semibold text-gray-400">Ficha Informativa</span>
       </div>
 
-      <!-- TÍTULO -->
-      <div class="grid grid-cols-3 gap-2 text-xs items-center">
-        <span class="text-gray-500 font-medium">Título:</span>
-        <div class="col-span-2">
-          <span *ngIf="!isEditing" class="text-gray-800 font-semibold">{{ incidencia?.titulo }}</span>
-          <input *ngIf="isEditing" [(ngModel)]="incidencia.titulo" type="text" class="w-full border border-gray-300 rounded-lg p-1.5 text-xs">
+      <!-- MODO VISTA (CUANDO NO SE ESTÁ EDITANDO) -->
+      <div *ngIf="!isEditing" class="space-y-6">
+
+        <!-- RESUMEN EN TARJETAS CLAVE -->
+        <div class="grid grid-cols-2 gap-4">
+          <div class="p-3.5 bg-indigo-50/50 border border-indigo-100 rounded-xl">
+            <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider block mb-1">Tipo de delito</span>
+            <span class="text-sm font-bold text-gray-900 block uppercase">{{ incidencia?.tipoDelito || incidencia?.tipo }}</span>
+          </div>
+
+          <div class="p-3.5 bg-gray-50 border border-gray-100 rounded-xl flex flex-col justify-center">
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Nivel de prioridad</span>
+            <div>
+              <span [ngClass]="{
+                'text-rose-700 bg-rose-100 border-rose-200': incidencia?.prioridad === 'ALTA' || incidencia?.prioridad === 'URGENTE',
+                'text-amber-700 bg-amber-100 border-amber-200': incidencia?.prioridad === 'MEDIA',
+                'text-slate-700 bg-slate-100 border-slate-200': incidencia?.prioridad === 'BAJA'
+              }" class="inline-block px-2.5 py-0.5 text-xs font-extrabold rounded-md border">
+                {{ incidencia?.prioridad || 'MEDIA' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TÍTULO Y DESCRIPCIÓN -->
+        <div class="space-y-3 pt-2">
+          <div>
+            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Título principal</span>
+            <p class="text-sm font-bold text-gray-900">{{ incidencia?.titulo }}</p>
+          </div>
+
+          <div>
+            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Descripción de los hechos</span>
+            <p class="text-xs text-gray-700 leading-relaxed bg-gray-50/60 p-3.5 rounded-xl border border-gray-100">
+              {{ incidencia?.descripcion }}
+            </p>
+          </div>
+        </div>
+
+        <!-- DATOS TEMPORALES Y DIRECCIÓN -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+          <div>
+            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Fecha y hora</span>
+            <p class="text-xs font-semibold text-gray-800 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              {{ incidencia?.fechaHora | date:'dd/MM/yyyy - HH:mm' }} hrs
+            </p>
+          </div>
+
+          <div>
+            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Lugar / Dirección</span>
+            <p class="text-xs font-semibold text-gray-800 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              {{ incidencia?.direccion }}
+            </p>
+          </div>
+        </div>
+
+        <!-- REFERENCIA -->
+        <div>
+          <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Referencia cercana</span>
+          <p class="text-xs text-gray-600 italic">
+            {{ incidencia?.referencia || 'Sin referencia registrada.' }}
+          </p>
+        </div>
+
+        <!-- JURISDICCIÓN Y RESPONSABLES -->
+        <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+          <div>
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5">Sector</span>
+            <p class="text-xs font-bold text-gray-800">{{ incidencia?.sector?.nombre || 'No asignado' }}</p>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5">Comisaría</span>
+            <p class="text-xs font-bold text-gray-800">{{ incidencia?.comisaria?.nombre || 'No asignada' }}</p>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5">Registrado por</span>
+            <p class="text-xs font-medium text-gray-700">{{ incidencia?.registradoPor?.nombre }} {{ incidencia?.registradoPor?.apellido }}</p>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5">Asignado a</span>
+            <p class="text-xs font-medium text-gray-700">{{ incidencia?.asignadoA?.nombre ? (incidencia.asignadoA.nombre + ' ' + (incidencia.asignadoA.apellido || '')) : 'No asignado' }}</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- MODO EDICIÓN -->
+      <div *ngIf="isEditing" class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs font-bold text-gray-700 block mb-1">Prioridad</label>
+            <select [(ngModel)]="incidencia.prioridad" class="w-full border border-gray-300 rounded-xl p-2 text-xs bg-white font-semibold text-gray-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer">
+              <option value="BAJA">BAJA</option>
+              <option value="MEDIA">MEDIA</option>
+              <option value="ALTA">ALTA</option>
+              <option value="URGENTE">URGENTE</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-bold text-gray-700 block mb-1">Tipo (Lectura)</label>
+            <input type="text" [value]="incidencia?.tipoDelito || incidencia?.tipo" disabled class="w-full border border-gray-200 rounded-xl p-2 text-xs bg-gray-100 text-gray-500 font-semibold cursor-not-allowed">
+          </div>
+        </div>
+
+        <div>
+          <label class="text-xs font-bold text-gray-700 block mb-1">Título de la incidencia</label>
+          <input [(ngModel)]="incidencia.titulo" type="text" class="w-full border border-gray-300 rounded-xl p-2.5 text-xs font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="text-xs font-bold text-gray-700 block mb-1">Descripción</label>
+          <textarea [(ngModel)]="incidencia.descripcion" rows="3" class="w-full border border-gray-300 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none"></textarea>
+        </div>
+
+        <div>
+          <label class="text-xs font-bold text-gray-700 block mb-1">Dirección</label>
+          <input [(ngModel)]="incidencia.direccion" type="text" class="w-full border border-gray-300 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="text-xs font-bold text-gray-700 block mb-1">Referencia</label>
+          <input [(ngModel)]="incidencia.referencia" type="text" class="w-full border border-gray-300 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
         </div>
       </div>
 
-      <!-- DESCRIPCIÓN -->
-      <div class="grid grid-cols-3 gap-2 text-xs items-center">
-        <span class="text-gray-500 font-medium">Descripción:</span>
-        <div class="col-span-2">
-          <span *ngIf="!isEditing" class="text-gray-700 leading-relaxed">{{ incidencia?.descripcion }}</span>
-          <textarea *ngIf="isEditing" [(ngModel)]="incidencia.descripcion" rows="3" class="w-full border border-gray-300 rounded-lg p-1.5 text-xs"></textarea>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-3 gap-2 text-xs items-center">
-        <span class="text-gray-500 font-medium">Fecha y hora:</span>
-        <span class="col-span-2 text-gray-800">{{ incidencia?.fechaHora | date:'dd/MM/yyyy HH:mm' }}</span>
-      </div>
-
-      <!-- DIRECCIÓN -->
-      <div class="grid grid-cols-3 gap-2 text-xs items-center">
-        <span class="text-gray-500 font-medium">Dirección:</span>
-        <div class="col-span-2">
-          <span *ngIf="!isEditing" class="text-gray-800">{{ incidencia?.direccion }}</span>
-          <input *ngIf="isEditing" [(ngModel)]="incidencia.direccion" type="text" class="w-full border border-gray-300 rounded-lg p-1.5 text-xs">
-        </div>
-      </div>
-
-      <!-- REFERENCIA -->
-      <div class="grid grid-cols-3 gap-2 text-xs items-center">
-        <span class="text-gray-500 font-medium">Referencia:</span>
-        <div class="col-span-2">
-          <span *ngIf="!isEditing" class="text-gray-800">{{ incidencia?.referencia }}</span>
-          <input *ngIf="isEditing" [(ngModel)]="incidencia.referencia" type="text" class="w-full border border-gray-300 rounded-lg p-1.5 text-xs">
-        </div>
-      </div>
-
-      <div class="grid grid-cols-3 gap-2 text-xs items-center">
-        <span class="text-gray-500 font-medium">Sector:</span>
-        <span class="col-span-2 text-gray-800">{{ incidencia?.sector?.nombre || 'No asignado' }}</span>
-      </div>
-
-      <div class="grid grid-cols-3 gap-2 text-xs items-center">
-        <span class="text-gray-500 font-medium">Comisaría:</span>
-        <span class="col-span-2 text-gray-800">{{ incidencia?.comisaria?.nombre || 'No asignada' }}</span>
-      </div>
-
-      <div class="grid grid-cols-3 gap-2 text-xs items-center">
-        <span class="text-gray-500 font-medium">Registrado por:</span>
-        <span class="col-span-2 text-gray-800">{{ incidencia?.registradoPor?.nombre }} {{ incidencia?.registradoPor?.apellido }}</span>
-      </div>
-
-      <div class="grid grid-cols-3 gap-2 text-xs items-center">
-        <span class="text-gray-500 font-medium">Asignado a:</span>
-        <span class="col-span-2 text-gray-800">{{ incidencia?.asignadoA?.nombre ? (incidencia.asignadoA.nombre + ' ' + (incidencia.asignadoA.apellido || '')) : 'No asignado' }}</span>
-      </div>
-
-      <!-- PRIORIDAD -->
-      <div class="grid grid-cols-3 gap-2 text-xs items-center">
-        <span class="text-gray-500 font-medium">Prioridad:</span>
-        <div class="col-span-2">
-          <span *ngIf="!isEditing" class="text-red-600 font-bold">{{ incidencia?.prioridad }}</span>
-          <select *ngIf="isEditing" [(ngModel)]="incidencia.prioridad" class="w-full border border-gray-300 rounded-lg p-1.5 text-xs bg-white font-semibold">
-            <option value="BAJA">BAJA</option>
-            <option value="MEDIA">MEDIA</option>
-            <option value="ALTA">ALTA</option>
-            <option value="URGENTE">URGENTE</option>
-          </select>
-        </div>
-      </div>
     </div>
 
     <!-- ================= COLUMNA DERECHA: UBICACIÓN, EVIDENCIAS E HISTORIAL ================= -->
-    <div class="lg:col-span-6 space-y-6">
+    <div class="lg:col-span-5 space-y-6 flex flex-col">
 
       <!-- MAPA DE UBICACIÓN -->
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-3">
-        <h2 class="text-sm font-bold text-gray-800">Ubicación</h2>
-        <div id="map-detalle" class="w-full h-40 rounded-xl border border-gray-100 z-0"></div>
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 space-y-3">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xs font-bold text-gray-900 flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            Ubicación en el mapa
+          </h2>
+          <span class="text-[10px] text-gray-400 font-mono">Cercado de Ica</span>
+        </div>
+
+        <div id="map-detalle" class="w-full h-56 rounded-xl border border-gray-200 overflow-hidden relative z-0"></div>
       </div>
 
       <!-- EVIDENCIAS -->
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-3">
-        <div class="flex items-center justify-between">
-          <h2 class="text-sm font-bold text-gray-800">Evidencias ({{ incidencia?.evidencias?.length || 0 }})</h2>
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 space-y-3">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-2">
+          <h2 class="text-xs font-bold text-gray-900 flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            Evidencias adjuntas
+          </h2>
+          <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">
+            {{ incidencia?.evidencias?.length || 0 }}
+          </span>
         </div>
-        <div class="grid grid-cols-2 gap-4" *ngIf="incidencia?.evidencias?.length > 0; else sinEvidencias">
-          <div *ngFor="let img of incidencia.evidencias" class="h-28 bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
-            <img [src]="img" alt="Evidencia" class="w-full h-full object-cover">
+
+        <div class="grid grid-cols-2 gap-3" *ngIf="incidencia?.evidencias?.length > 0; else sinEvidencias">
+          <div *ngFor="let img of incidencia.evidencias" class="h-28 bg-gray-100 rounded-xl overflow-hidden border border-gray-200 group relative">
+            <img [src]="img" alt="Evidencia" class="w-full h-full object-cover transition transform group-hover:scale-105 duration-200">
           </div>
         </div>
+
         <ng-template #sinEvidencias>
-          <p class="text-xs text-gray-400 italic">No hay evidencias registradas para esta incidencia.</p>
+          <div class="p-6 bg-gray-50/70 border border-dashed border-gray-200 rounded-xl text-center">
+            <p class="text-xs font-medium text-gray-500 mb-0.5">No hay evidencias registradas</p>
+            <p class="text-[11px] text-gray-400">No se han subido fotografías ni archivos adjuntos.</p>
+          </div>
         </ng-template>
       </div>
 
-      <!-- HISTORIAL DE ESTADOS -->
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-4">
-        <h2 class="text-sm font-bold text-gray-800">Historial de estados</h2>
+      <!-- HISTORIAL DE ESTADOS (TIMELINE VERTICAL) -->
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 space-y-4 flex-1">
+        <h2 class="text-xs font-bold text-gray-900 border-b border-gray-100 pb-2 flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Historial de cambios de estado
+        </h2>
         
-        <div class="space-y-3" *ngIf="incidencia?.historialEstados?.length > 0; else sinHistorial">
-          <div *ngFor="let h of incidencia.historialEstados" class="flex items-center justify-between text-xs border-b border-gray-100 pb-2.5">
-            <div class="flex items-center gap-2.5">
-              <span class="w-2.5 h-2.5 rounded-full bg-purple-600"></span>
-              <span class="font-semibold text-gray-800">{{ h.estado }}</span>
+        <div class="relative pl-6 space-y-4 pt-1 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-gray-200" *ngIf="incidencia?.historialEstados?.length > 0; else sinHistorial">
+          
+          <div *ngFor="let h of incidencia.historialEstados; let last = last" class="relative">
+            <span [ngClass]="last ? 'bg-indigo-600 ring-4 ring-indigo-100' : 'bg-gray-400'" class="absolute -left-6 top-1 w-3 h-3 rounded-full transition-all"></span>
+            
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-bold text-gray-800">{{ h.estado }}</span>
+              <span class="text-[10px] font-semibold text-gray-400">{{ h.fecha | date:'dd/MM/yyyy HH:mm' }}</span>
             </div>
-            <span class="text-gray-500">{{ h.fecha | date:'dd/MM/yyyy HH:mm' }}</span>
-            <span class="text-gray-700 font-medium">{{ h.usuario?.nombre }} {{ h.usuario?.apellido }}</span>
+            
+            <p class="text-[11px] text-gray-500 mt-0.5">
+              Por: <span class="font-medium text-gray-700">{{ h.usuario?.nombre }} {{ h.usuario?.apellido }}</span>
+            </p>
           </div>
+
         </div>
+
         <ng-template #sinHistorial>
-          <p class="text-xs text-gray-400 italic">Sin historial disponible.</p>
+          <p class="text-xs text-gray-400 italic text-center py-4">Sin historial de cambios disponible.</p>
         </ng-template>
       </div>
 
@@ -178,10 +278,10 @@
   </div>
 </div>
 
-<!-- Plantilla de carga mientras responde el backend en Render -->
+<!-- TEMPLATE DE CARGA -->
 <ng-template #loadingTemplate>
   <div class="min-h-screen flex flex-col items-center justify-center bg-gray-50">
     <div class="spinner-border text-indigo-600 animate-spin w-10 h-10 border-4 border-current border-t-transparent rounded-full" role="status"></div>
-    <p class="mt-4 text-sm font-medium text-gray-600">Cargando detalles de la incidencia...</p>
+    <p class="mt-4 text-xs font-semibold text-gray-600 tracking-wide">Cargando detalles de la incidencia...</p>
   </div>
 </ng-template>

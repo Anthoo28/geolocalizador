@@ -64,14 +64,14 @@
               </div>
             </div>
 
-            <!-- Sector con evento de actualización -->
+            <!-- Sector Dinámico conectado a la Base de Datos -->
             <div class="space-y-1.5">
               <label class="block text-xs font-semibold text-gray-700">Sector</label>
               <select [(ngModel)]="reporte.sector" (change)="onFiltroChange()" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
                 <option value="Todos">Todos</option>
-                <option value="Sector Centro">Sector Centro</option>
-                <option value="Sector Norte">Sector Norte</option>
-                <option value="Sector Sur">Sector Sur</option>
+                <option *ngFor="let s of sectoresDisponibles" [value]="s._id">
+                  {{ s.nombre }}
+                </option>
               </select>
             </div>
 

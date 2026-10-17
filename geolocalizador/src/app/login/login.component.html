@@ -1,4 +1,34 @@
-<div class="w-[1100px] h-[650px] bg-white rounded-3xl shadow-2xl overflow-hidden flex mx-auto my-auto">
+<div class="w-[1100px] h-[650px] bg-white rounded-3xl shadow-2xl overflow-hidden flex mx-auto my-auto relative">
+
+  <!-- Toast / Popup Flotante (Éxito o Error) -->
+  <div *ngIf="toastMessage" 
+       [ngClass]="{
+         'border-emerald-500 text-emerald-800 bg-emerald-50': toastType === 'success',
+         'border-red-500 text-red-800 bg-red-50': toastType === 'error'
+       }"
+       class="fixed top-5 right-5 z-50 flex items-center w-full max-w-xs p-4 rounded-xl shadow-2xl border-l-4 transition-all duration-300" 
+       role="alert">
+      
+      <!-- Icono de Éxito -->
+      <div *ngIf="toastType === 'success'" class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-emerald-600 bg-emerald-200 rounded-lg">
+          <i class="fa-solid fa-check"></i>
+      </div>
+
+      <!-- Icono de Error -->
+      <div *ngIf="toastType === 'error'" class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-red-600 bg-red-200 rounded-lg">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+
+      <!-- Texto del mensaje -->
+      <div class="ml-3 text-sm font-medium">
+        {{ toastMessage }}
+      </div>
+
+      <!-- Botón para cerrar manualmente -->
+      <button type="button" (click)="toastMessage = ''" class="ml-auto -mx-1.5 -my-1.5 text-gray-400 hover:text-gray-900 rounded-lg p-1.5 inline-flex h-8 w-8 items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+      </button>
+  </div>
 
   <!-- LADO IZQUIERDO -->
   <div class="w-1/2 flex flex-col justify-center items-center px-16">
@@ -30,7 +60,7 @@
         <input
           type="email"
           formControlName="email"
-          placeholder="email electrónico"
+          placeholder="Correo electrónico"
           class="w-full border rounded-lg py-3 pl-11 pr-4 outline-none focus:ring-2 focus:ring-indigo-500"
           [ngClass]="{'border-red-500': loginForm.get('email')?.touched && loginForm.get('email')?.invalid}"
         />
@@ -61,11 +91,6 @@
         <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.errors?.['required']" class="text-red-500 text-xs mt-1 pl-1">
           La contraseña es obligatoria.
         </div>
-      </div>
-
-      <!-- Alerta de Error del Servidor -->
-      <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-600 text-sm p-3 rounded-lg text-center">
-        {{ errorMessage }}
       </div>
 
       <div class="text-center pt-1">

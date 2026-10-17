@@ -25,7 +25,10 @@ export class MapaInteractivoComponent implements OnInit, AfterViewInit {
   incidencias: IncidenciaModel[] = [];
   incidenciasFiltradas: IncidenciaModel[] = [];
   incidenciaSeleccionada: IncidenciaModel | null = null; 
-  totalIncidencias: number = 0; // Conteo dinámico
+  totalIncidencias: number = 0;
+
+  // Modo de visualización: 'marcadores' o 'calor'
+  modoMapa: 'marcadores' | 'calor' = 'marcadores';
 
   // Variables para los filtros
   tiposDelitoDisponibles: string[] = [];
@@ -36,6 +39,7 @@ export class MapaInteractivoComponent implements OnInit, AfterViewInit {
   private map: any;
   private L: any; 
   private markersLayer: any; 
+  private heatLayer: any;
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) { }
 
@@ -48,7 +52,9 @@ export class MapaInteractivoComponent implements OnInit, AfterViewInit {
       const leafletModule = await import('leaflet');
       this.L = leafletModule.default || leafletModule;
       
-      // Esperar brevemente a que el DOM pinte el elemento del mapa
+      // Cargar dinámicamente el plugin leaflet.heat para el mapa de calor
+      await import('leaflet.heat');
+
       setTimeout(() => {
         this.initMap();
       }, 100);
@@ -67,20 +73,56 @@ export class MapaInteractivoComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    this.map = this.L.map('map', {
-      zoomControl: false
-    }).setView([-14.0677, -75.7286], 15);
+    const centroIca: [number, number] = [-14.0677, -75.7286];
 
-    // 🟢 Capa base oficial de OpenStreetMap con cobertura total garantizada
+    this.map = this.L.map('map', {
+      zoomControl: false,
+      maxBounds: [
+        [-14.0950, -75.7550], // Suroeste permitido
+        [-14.0400, -75.7000]  // Noreste permitido
+      ],
+      maxBoundsViscosity: 1.0,
+      minZoom: 15,
+      maxZoom: 18
+    }).setView(centroIca, 15.5);
+
+    // Capa base oficial de OpenStreetMap
     this.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(this.map);
 
+    // Máscara circular para Ica Centro (Oscurece el exterior)
+    const radioKm = 1.3; 
+    const numPuntos = 48; 
+    const huecoCircular: [number, number][] = [];
+
+    for (let i = 0; i < numPuntos; i++) {
+      const angulo = (i * 2 * Math.PI) / numPuntos;
+      const latOffset = (radioKm / 111) * Math.cos(angulo);
+      const lngOffset = (radioKm / (111 * Math.cos(centroIca[0] * Math.PI / 180))) * Math.sin(angulo);
+      huecoCircular.push([centroIca[0] + latOffset, centroIca[1] + lngOffset]);
+    }
+
+    const mundoExterior: [number, number][] = [
+      [-90, -180],
+      [-90, 180],
+      [90, 180],
+      [90, -180]
+    ];
+
+    this.L.polygon([mundoExterior, huecoCircular], {
+      color: 'transparent',
+      fillColor: '#0f172a', 
+      fillOpacity: 0.85,    
+      weight: 0,
+      interactive: false
+    }).addTo(this.map);
+
     this.markersLayer = this.L.layerGroup().addTo(this.map);
 
     if (this.incidenciasFiltradas.length > 0) {
-      this.pintarMarcadores();
+      this.actualizarCapaMapa();
     }
   }
 
@@ -97,17 +139,12 @@ export class MapaInteractivoComponent implements OnInit, AfterViewInit {
           this.incidencias = [];
         }
 
-        // Asignar el total que viene del backend o calcularlo del array
         this.totalIncidencias = res && typeof res.total === 'number' ? res.total : this.incidencias.length;
-
-        // Inicialmente las filtradas son todas
         this.incidenciasFiltradas = [...this.incidencias];
 
-        // Forzar actualización inmediata en la vista
         this.cdr.markForCheck();
         this.cdr.detectChanges();
 
-        // Extraer tipos de delito únicos para el select de filtros
         const tiposSet = new Set<string>();
         this.incidencias.forEach((inc: any) => {
           if (inc.tipoDelito) tiposSet.add(inc.tipoDelito);
@@ -115,7 +152,7 @@ export class MapaInteractivoComponent implements OnInit, AfterViewInit {
         this.tiposDelitoDisponibles = Array.from(tiposSet);
 
         if (this.map && this.L) {
-          this.pintarMarcadores();
+          this.actualizarCapaMapa();
         }
       },
       error: (err) => {
@@ -124,11 +161,30 @@ export class MapaInteractivoComponent implements OnInit, AfterViewInit {
     });
   }
 
+  cambiarModoMapa(modo: 'marcadores' | 'calor'): void {
+    this.modoMapa = modo;
+    this.actualizarCapaMapa();
+  }
+
+  actualizarCapaMapa(): void {
+    if (!this.map || !this.L) return;
+
+    // Limpiar capas previas
+    if (this.markersLayer) this.markersLayer.clearLayers();
+    if (this.heatLayer) {
+      this.map.removeLayer(this.heatLayer);
+      this.map.off('zoomend.heat'); // Limpiar listener anterior para evitar fugas de memoria
+    }
+
+    if (this.modoMapa === 'marcadores') {
+      this.pintarMarcadores();
+    } else {
+      this.pintarMapaDeCalor();
+    }
+  }
+
   private pintarMarcadores(): void {
     if (!this.markersLayer) return;
-    this.markersLayer.clearLayers(); 
-
-    // Mapa para rastrear coordenadas repetidas y aplicarles un pequeño desfase visual
     const coordenadasVistas = new Map<string, number>();
 
     this.incidenciasFiltradas.forEach(inc => {
@@ -138,30 +194,25 @@ export class MapaInteractivoComponent implements OnInit, AfterViewInit {
         let lng = item.ubicacion.coordinates[0]; 
         let lat = item.ubicacion.coordinates[1]; 
 
-        // Llave única basada en las coordenadas exactas
         const claveCoord = `${lat.toFixed(5)},${lng.toFixed(5)}`;
 
         if (coordenadasVistas.has(claveCoord)) {
           const veces = coordenadasVistas.get(claveCoord)!;
           coordenadasVistas.set(claveCoord, veces + 1);
-
-          // Desplazamiento sutil para separar los pines con coordenadas idénticas
           lat += veces * 0.00018;
           lng += veces * 0.00018;
         } else {
           coordenadasVistas.set(claveCoord, 1);
         }
 
-        // Definir color según el estado mapeado a la leyenda
-        let colorHex = '#ef4444'; // Rojo (Registrado por defecto)
+        let colorHex = '#ef4444'; 
         const estadoUpper = (item.estado || '').toUpperCase();
         if (estadoUpper.includes('ATENCION') || estadoUpper.includes('EN_ATENCION')) {
-          colorHex = '#f59e0b'; // Ámbar (En atención)
+          colorHex = '#f59e0b'; 
         } else if (estadoUpper.includes('ATENDIDA') || estadoUpper.includes('RESUELTA')) {
-          colorHex = '#10b981'; // Esmeralda (Atendida)
+          colorHex = '#10b981'; 
         }
 
-        // Usamos pointer-events: none en el div interno para que el clic lo reciba el marcador Leaflet
         const customIcon = this.L.divIcon({
           className: 'custom-pin-icon',
           html: `
@@ -189,6 +240,58 @@ export class MapaInteractivoComponent implements OnInit, AfterViewInit {
     });
   }
 
+  private pintarMapaDeCalor(): void {
+    const heatPoints: [number, number, number][] = [];
+
+    this.incidenciasFiltradas.forEach(inc => {
+      const item = inc as any;
+      if (item.ubicacion && item.ubicacion.coordinates && item.ubicacion.coordinates.length >= 2) {
+        const lng = item.ubicacion.coordinates[0];
+        const lat = item.ubicacion.coordinates[1];
+        const peso = item.peso || 1.0;
+        heatPoints.push([lat, lng, peso]);
+      }
+    });
+
+    if (this.L.heatLayer && heatPoints.length > 0) {
+      const currentZoom = this.map.getZoom();
+      const dynamicRadius = this.calcularRadioPorZoom(currentZoom);
+
+      this.heatLayer = this.L.heatLayer(heatPoints, {
+        radius: dynamicRadius,
+        blur: Math.round(dynamicRadius * 0.6),
+        minOpacity: 0.35,
+        max: 1,
+        maxZoom: 18,
+        gradient: {
+          0.2: '#3b82f6', // Azul: Baja densidad / Aislado
+          0.5: '#eab308', // Amarillo: Densidad moderada
+          0.75: '#f97316',// Naranja: Zona de atención
+          1.0: '#dc2626'  // Rojo: Alta concentración crítica
+        }
+      }).addTo(this.map);
+
+      // Escucha el evento de zoom para actualizar el radio en tiempo real (Producción Ready)
+      this.map.on('zoomend.heat', () => {
+        if (this.modoMapa === 'calor' && this.heatLayer) {
+          const newZoom = this.map.getZoom();
+          const newRadius = this.calcularRadioPorZoom(newZoom);
+          this.heatLayer.setOptions({
+            radius: newRadius,
+            blur: Math.round(newRadius * 0.6)
+          });
+        }
+      });
+    }
+  }
+
+  private calcularRadioPorZoom(zoom: number): number {
+    if (zoom <= 15) return 18;
+    if (zoom === 16) return 26;
+    if (zoom === 17) return 38;
+    return 52; // Zoom 18+
+  }
+
   aplicarFiltros(): void {
     this.incidenciasFiltradas = this.incidencias.filter(inc => {
       const item = inc as any;
@@ -206,7 +309,7 @@ export class MapaInteractivoComponent implements OnInit, AfterViewInit {
     });
 
     this.totalIncidencias = this.incidenciasFiltradas.length; 
-    this.pintarMarcadores();
+    this.actualizarCapaMapa();
     this.incidenciaSeleccionada = null; 
   }
 
@@ -216,7 +319,7 @@ export class MapaInteractivoComponent implements OnInit, AfterViewInit {
     this.filtroFechaFin = '';
     this.incidenciasFiltradas = [...this.incidencias];
     this.totalIncidencias = this.incidenciasFiltradas.length; 
-    this.pintarMarcadores();
+    this.actualizarCapaMapa();
     this.incidenciaSeleccionada = null;
   }
 
@@ -239,6 +342,6 @@ export class MapaInteractivoComponent implements OnInit, AfterViewInit {
   }
 
   restablecerVista(): void {
-    if (this.map) this.map.setView([-14.0677, -75.7286], 15);
+    if (this.map) this.map.setView([-14.0677, -75.7286], 15.5);
   }
 }
